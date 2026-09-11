@@ -1,4 +1,5 @@
 import { createJoueur } from "@/app/admin/actions";
+import { CATEGORIES, POSTES } from "@/lib/rugby";
 
 export default async function NewJoueurPage({
   searchParams,
@@ -45,23 +46,47 @@ export default async function NewJoueurPage({
             />
           </label>
           <label className="block text-sm font-medium">
-            Poste (optionnel)
-            <input
-              type="text"
-              name="poste"
-              className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-            />
+            Catégorie
+            <select
+              name="categorie"
+              defaultValue="Seniors"
+              required
+              className="mt-1 w-full rounded border border-black/20 bg-white px-3 py-2"
+            >
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
         <label className="block text-sm font-medium">
-          Catégorie
+          Poste (optionnel)
+          <select
+            name="poste"
+            defaultValue=""
+            className="mt-1 w-full rounded border border-black/20 bg-white px-3 py-2"
+          >
+            <option value="">— Non renseigné —</option>
+            {POSTES.map((poste) => (
+              <option key={poste} value={poste}>
+                {poste}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-sm font-medium">
+          Photo (optionnelle)
           <input
-            type="text"
-            name="categorie"
-            defaultValue="Seniors"
-            required
+            type="file"
+            name="photo"
+            accept="image/*"
             className="mt-1 w-full rounded border border-black/20 px-3 py-2"
           />
+          <span className="mt-1 block text-xs text-foreground/50">
+            Si aucune photo n&apos;est fournie, une silhouette par défaut sera affichée.
+          </span>
         </label>
         <button
           type="submit"

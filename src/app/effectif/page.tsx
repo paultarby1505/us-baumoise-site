@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getJoueurs } from "@/lib/queries";
 import PlayerCard from "@/components/PlayerCard";
+import { categoryRank } from "@/lib/rugby";
 import type { Joueur } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +18,9 @@ function groupByCategorie(joueurs: Joueur[]) {
     liste.push(joueur);
     groupes.set(joueur.categorie, liste);
   }
-  return groupes;
+  return [...groupes.entries()].sort(
+    ([a], [b]) => categoryRank(a) - categoryRank(b)
+  );
 }
 
 export default async function EffectifPage() {
@@ -27,10 +30,10 @@ export default async function EffectifPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       <h1 className="text-2xl font-extrabold">Effectif</h1>
-      {[...groupes.entries()].map(([categorie, membres]) => (
+      {groupes.map(([categorie, membres]) => (
         <section key={categorie} className="mt-8">
           <h2 className="text-lg font-bold text-club-gold">{categorie}</h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {membres.map((joueur) => (
               <PlayerCard key={joueur.id} joueur={joueur} />
             ))}

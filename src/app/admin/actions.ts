@@ -20,6 +20,26 @@ function intOrNull(formData: FormData, key: string): number | null {
   return Number.isNaN(n) ? null : n;
 }
 
+async function uploadPhotoIfProvided(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  formData: FormData,
+  joueurId: string
+): Promise<string | undefined> {
+  const file = formData.get("photo");
+  if (!(file instanceof File) || file.size === 0) return undefined;
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${joueurId}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("joueurs-photos")
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (error) throw error;
+
+  const { data } = supabase.storage.from("joueurs-photos").getPublicUrl(path);
+  return `${data.publicUrl}?v=${Date.now()}`;
+}
+
 // --- Auth ---
 
 export async function login(formData: FormData) {
@@ -109,12 +129,27 @@ export async function deleteActualite(id: string) {
 
 export async function createJoueur(formData: FormData) {
   const supabase = await createServerSupabaseClient();
+  const id = crypto.randomUUID();
+
+  let photoUrl: string | undefined;
+  try {
+    photoUrl = await uploadPhotoIfProvided(supabase, formData, id);
+  } catch (e) {
+    redirect(
+      `/admin/effectif/new?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi de la photo"
+      )}`
+    );
+  }
+
   const { error } = await supabase.from("joueurs").insert({
+    id,
     prenom: str(formData, "prenom"),
     nom: str(formData, "nom"),
     numero: intOrNull(formData, "numero"),
     poste: strOrNull(formData, "poste"),
     categorie: str(formData, "categorie") || "Seniors",
+    photo_url: photoUrl ?? null,
   });
   if (error) redirect(`/admin/effectif/new?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/effectif");
@@ -122,16 +157,28 @@ export async function createJoueur(formData: FormData) {
 
 export async function updateJoueur(id: string, formData: FormData) {
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase
-    .from("joueurs")
-    .update({
-      prenom: str(formData, "prenom"),
-      nom: str(formData, "nom"),
-      numero: intOrNull(formData, "numero"),
-      poste: strOrNull(formData, "poste"),
-      categorie: str(formData, "categorie") || "Seniors",
-    })
-    .eq("id", id);
+
+  let photoUrl: string | undefined;
+  try {
+    photoUrl = await uploadPhotoIfProvided(supabase, formData, id);
+  } catch (e) {
+    redirect(
+      `/admin/effectif/${id}?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi de la photo"
+      )}`
+    );
+  }
+
+  const updateData: Record<string, unknown> = {
+    prenom: str(formData, "prenom"),
+    nom: str(formData, "nom"),
+    numero: intOrNull(formData, "numero"),
+    poste: strOrNull(formData, "poste"),
+    categorie: str(formData, "categorie") || "Seniors",
+  };
+  if (photoUrl) updateData.photo_url = photoUrl;
+
+  const { error } = await supabase.from("joueurs").update(updateData).eq("id", id);
   if (error) redirect(`/admin/effectif/${id}?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/effectif");
 }
@@ -139,6 +186,14 @@ export async function updateJoueur(id: string, formData: FormData) {
 export async function deleteJoueur(id: string) {
   const supabase = await createServerSupabaseClient();
   await supabase.from("joueurs").delete().eq("id", id);
+  const { data: files } = await supabase.storage.from("joueurs-photos").list("", {
+    search: id,
+  });
+  if (files && files.length > 0) {
+    await supabase.storage
+      .from("joueurs-photos")
+      .remove(files.map((f) => f.name));
+  }
   redirect("/admin/effectif");
 }
 

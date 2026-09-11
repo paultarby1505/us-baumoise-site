@@ -1,7 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { deleteJoueur } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import { categoryRank } from "@/lib/rugby";
 import type { Joueur } from "@/lib/types";
 
 export default async function AdminEffectifPage() {
@@ -9,9 +11,10 @@ export default async function AdminEffectifPage() {
   const { data } = await supabase
     .from("joueurs")
     .select("*")
-    .order("categorie", { ascending: true })
     .order("numero", { ascending: true });
-  const joueurs = (data ?? []) as Joueur[];
+  const joueurs = ((data ?? []) as Joueur[]).sort(
+    (a, b) => categoryRank(a.categorie) - categoryRank(b.categorie)
+  );
 
   return (
     <div>
@@ -28,15 +31,38 @@ export default async function AdminEffectifPage() {
       <div className="mt-6 divide-y divide-black/10 rounded-lg border border-black/10 bg-white">
         {joueurs.map((joueur) => (
           <div key={joueur.id} className="flex items-center justify-between gap-4 p-4">
-            <div>
-              <p className="font-semibold">
-                {joueur.numero ? `#${joueur.numero} — ` : ""}
-                {joueur.prenom} {joueur.nom}
-              </p>
-              <p className="text-xs text-foreground/50">
-                {joueur.categorie}
-                {joueur.poste ? ` · ${joueur.poste}` : ""}
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-club-black-soft">
+                {joueur.photo_url ? (
+                  <Image
+                    src={joueur.photo_url}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
+                ) : (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="h-full w-full p-2 text-white/25"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8v1H4v-1z" />
+                  </svg>
+                )}
+              </div>
+              <div>
+                <p className="font-semibold">
+                  {joueur.numero ? `#${joueur.numero} — ` : ""}
+                  {joueur.prenom} {joueur.nom}
+                </p>
+                <p className="text-xs text-foreground/50">
+                  {joueur.categorie}
+                  {joueur.poste ? ` · ${joueur.poste}` : ""}
+                </p>
+              </div>
             </div>
             <div className="flex shrink-0 gap-3 text-sm">
               <Link href={`/admin/effectif/${joueur.id}`} className="text-club-gold hover:underline">

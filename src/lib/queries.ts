@@ -24,7 +24,6 @@ export async function getJoueurs(): Promise<Joueur[]> {
   const { data, error } = await supabase
     .from("joueurs")
     .select("*")
-    .order("categorie", { ascending: true })
     .order("numero", { ascending: true });
   if (error) throw error;
   return data ?? [];

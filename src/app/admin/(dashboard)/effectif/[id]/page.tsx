@@ -1,7 +1,9 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { updateJoueur, deleteJoueur } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import { CATEGORIES, POSTES } from "@/lib/rugby";
 
 export default async function EditJoueurPage({
   params,
@@ -27,6 +29,19 @@ export default async function EditJoueurPage({
       {error && (
         <p className="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}
+
+      {joueur.photo_url && (
+        <div className="relative mt-4 h-32 w-32 overflow-hidden rounded-lg border border-black/10">
+          <Image
+            src={joueur.photo_url}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="128px"
+          />
+        </div>
+      )}
+
       <form action={updateJoueur.bind(null, id)} className="mt-6 max-w-md space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <label className="block text-sm font-medium">
@@ -62,22 +77,42 @@ export default async function EditJoueurPage({
             />
           </label>
           <label className="block text-sm font-medium">
-            Poste (optionnel)
-            <input
-              type="text"
-              name="poste"
-              defaultValue={joueur.poste ?? ""}
-              className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-            />
+            Catégorie
+            <select
+              name="categorie"
+              defaultValue={joueur.categorie}
+              required
+              className="mt-1 w-full rounded border border-black/20 bg-white px-3 py-2"
+            >
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
         <label className="block text-sm font-medium">
-          Catégorie
+          Poste (optionnel)
+          <select
+            name="poste"
+            defaultValue={joueur.poste ?? ""}
+            className="mt-1 w-full rounded border border-black/20 bg-white px-3 py-2"
+          >
+            <option value="">— Non renseigné —</option>
+            {POSTES.map((poste) => (
+              <option key={poste} value={poste}>
+                {poste}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-sm font-medium">
+          {joueur.photo_url ? "Remplacer la photo" : "Photo (optionnelle)"}
           <input
-            type="text"
-            name="categorie"
-            defaultValue={joueur.categorie}
-            required
+            type="file"
+            name="photo"
+            accept="image/*"
             className="mt-1 w-full rounded border border-black/20 px-3 py-2"
           />
         </label>

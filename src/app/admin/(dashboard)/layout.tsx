@@ -1,17 +1,36 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { logout } from "@/app/admin/actions";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 export const metadata: Metadata = {
   title: { default: "Administration", template: "%s — Administration" },
   robots: { index: false, follow: false },
 };
 
-export default function AdminDashboardLayout({
+export default async function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Le proxy garantit déjà une session pour arriver ici, mais un compte
+  // dont le profil a été retiré (accès révoqué) doit être déconnecté
+  // plutôt que de continuer à voir le tableau de bord.
+  const { data: profile } = user
+    ? await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle()
+    : { data: null };
+
+  if (!profile) {
+    await supabase.auth.signOut();
+    redirect(`/admin/login?error=${encodeURIComponent("Ton accès a été révoqué.")}`);
+  }
+
   return (
     <div className="min-h-screen bg-neutral-50">
       <header className="bg-club-black text-white">
@@ -39,6 +58,11 @@ export default function AdminDashboardLayout({
           <Link href="/admin/matchs" className="hover:text-club-gold-light">
             Matchs
           </Link>
+          {profile.role === "owner" && (
+            <Link href="/admin/equipe" className="hover:text-club-gold-light">
+              Équipe
+            </Link>
+          )}
           <Link href="/" className="ml-auto hover:text-club-gold-light">
             Voir le site →
           </Link>

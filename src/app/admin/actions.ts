@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createEphemeralSupabaseClient } from "@/lib/supabase-ephemeral";
+import { getCurrentProfile } from "@/lib/auth";
 import { slugify } from "@/lib/slugify";
 
 function str(formData: FormData, key: string): string {
@@ -59,15 +61,67 @@ export async function logout() {
   redirect("/admin/login");
 }
 
-export async function setupAdmin(formData: FormData) {
+// --- Équipe (rôles) ---
+
+export async function addTeamMember(formData: FormData) {
   const email = str(formData, "email");
   const password = str(formData, "password");
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.signUp({ email, password });
-  if (error) {
-    redirect(`/admin/setup?error=${encodeURIComponent(error.message)}`);
+
+  const owner = await getCurrentProfile();
+  if (owner?.role !== "owner") {
+    redirect(`/admin?error=${encodeURIComponent("Réservé au propriétaire du site.")}`);
   }
-  redirect("/admin/setup?success=1");
+
+  // Client "jetable" : ne touche pas aux cookies, donc ne déconnecte pas
+  // le propriétaire actuellement connecté en créant ce nouveau compte.
+  const anon = createEphemeralSupabaseClient();
+  const { data: signUpData, error: signUpError } = await anon.auth.signUp({
+    email,
+    password,
+  });
+  if (signUpError || !signUpData.user) {
+    redirect(
+      `/admin/equipe?error=${encodeURIComponent(
+        signUpError?.message ?? "Erreur lors de la création du compte"
+      )}`
+    );
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const { error: profileError } = await supabase.from("profiles").insert({
+    id: signUpData.user.id,
+    email,
+    role: "editor",
+  });
+  if (profileError) {
+    redirect(`/admin/equipe?error=${encodeURIComponent(profileError.message)}`);
+  }
+  redirect("/admin/equipe?success=1");
+}
+
+export async function removeTeamMember(id: string) {
+  const owner = await getCurrentProfile();
+  if (owner?.role !== "owner") {
+    redirect(`/admin?error=${encodeURIComponent("Réservé au propriétaire du site.")}`);
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const { data: target } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (target?.role === "owner") {
+    redirect(
+      `/admin/equipe?error=${encodeURIComponent(
+        "Impossible de retirer le propriétaire du site."
+      )}`
+    );
+  }
+
+  await supabase.from("profiles").delete().eq("id", id);
+  redirect("/admin/equipe");
 }
 
 // --- Actualités ---

@@ -7,7 +7,7 @@ const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   "sb_publishable_XabhBjOi4WPCJn8fDV1O2w_D1CR6jO4";
 
-const PUBLIC_ADMIN_PATHS = ["/admin/login", "/admin/setup"];
+const PUBLIC_ADMIN_PATHS = ["/admin/login"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });

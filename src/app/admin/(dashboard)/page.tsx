@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/auth";
 
 const sections = [
   {
@@ -18,12 +19,34 @@ const sections = [
   },
 ];
 
-export default function AdminHomePage() {
+export default async function AdminHomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  const profile = await getCurrentProfile();
+
+  const allSections =
+    profile?.role === "owner"
+      ? [
+          ...sections,
+          {
+            href: "/admin/equipe",
+            label: "Équipe",
+            description: "Ajouter ou retirer des rédacteurs (réservé à toi).",
+          },
+        ]
+      : sections;
+
   return (
     <div>
       <h1 className="text-2xl font-extrabold">Tableau de bord</h1>
+      {error && (
+        <p className="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+      )}
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {sections.map((section) => (
+        {allSections.map((section) => (
           <Link
             key={section.href}
             href={section.href}

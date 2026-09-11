@@ -19,7 +19,7 @@ export default async function MatchsPage() {
       <h1 className="text-2xl font-extrabold">Calendrier des matchs</h1>
 
       <section className="mt-8">
-        <h2 className="text-lg font-bold text-club-green">À venir</h2>
+        <h2 className="text-lg font-bold text-club-gold">À venir</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {prochains.map((match) => (
             <MatchCard key={match.id} match={match} />
@@ -31,7 +31,7 @@ export default async function MatchsPage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="text-lg font-bold text-club-green">Résultats</h2>
+        <h2 className="text-lg font-bold text-club-gold">Résultats</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {passes.map((match) => (
             <MatchCard key={match.id} match={match} />

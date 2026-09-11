@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getActualites, getMatchs, getProchainsMatchs } from "@/lib/queries";
 import NewsCard from "@/components/NewsCard";
 import MatchCard from "@/components/MatchCard";
+import ClubCrest from "@/components/ClubCrest";
 import { siteConfig } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +14,11 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="bg-club-green-dark text-white">
-        <div className="mx-auto max-w-5xl px-4 py-16 text-center">
-          <h1 className="text-3xl font-extrabold sm:text-4xl">{siteConfig.name}</h1>
-          <p className="mt-3 text-white/80">{siteConfig.description}</p>
+      <section className="bg-club-black text-white">
+        <div className="mx-auto flex max-w-5xl flex-col items-center px-4 py-16 text-center">
+          <ClubCrest size={120} />
+          <h1 className="mt-6 text-3xl font-extrabold sm:text-4xl">{siteConfig.name}</h1>
+          <p className="mt-3 max-w-2xl text-white/80">{siteConfig.description}</p>
         </div>
       </section>
 
@@ -32,7 +34,7 @@ export default async function HomePage() {
       <section className="mx-auto max-w-5xl px-4 py-10">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Dernières actualités</h2>
-          <Link href="/actualites" className="text-sm font-semibold text-club-green">
+          <Link href="/actualites" className="text-sm font-semibold text-club-gold">
             Toutes les actualités →
           </Link>
         </div>

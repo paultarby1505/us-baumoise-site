@@ -18,13 +18,13 @@ export default function MatchCard({ match }: { match: Match }) {
 
   return (
     <div className="rounded-lg border border-black/10 p-5">
-      <p className="text-xs font-semibold uppercase tracking-wide text-club-green">
+      <p className="text-xs font-semibold uppercase tracking-wide text-club-gold">
         {match.competition ?? "Match"} — {formatDate(match.date_match)}
       </p>
       <div className="mt-2 flex items-center justify-between gap-4">
         <span className="font-semibold">{domicileLabel}</span>
         {joue ? (
-          <span className="font-bold text-club-green">
+          <span className="font-bold text-club-gold">
             {match.domicile ? match.score_us : match.score_adverse} -{" "}
             {match.domicile ? match.score_adverse : match.score_us}
           </span>

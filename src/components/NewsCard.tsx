@@ -15,7 +15,7 @@ export default function NewsCard({ actualite }: { actualite: Actualite }) {
       href={`/actualites/${actualite.slug}`}
       className="block rounded-lg border border-black/10 p-5 transition-shadow hover:shadow-md"
     >
-      <p className="text-xs text-club-green font-semibold uppercase tracking-wide">
+      <p className="text-xs text-club-gold font-semibold uppercase tracking-wide">
         {formatDate(actualite.publie_le)}
       </p>
       <h3 className="mt-2 text-lg font-bold">{actualite.titre}</h3>

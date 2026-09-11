@@ -44,7 +44,7 @@ export default async function ActualitePage({
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
-      <p className="text-xs font-semibold uppercase tracking-wide text-club-green">
+      <p className="text-xs font-semibold uppercase tracking-wide text-club-gold">
         {formatDate(actualite.publie_le)}
       </p>
       <h1 className="mt-2 text-2xl font-extrabold sm:text-3xl">

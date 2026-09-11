@@ -29,7 +29,7 @@ export default async function EffectifPage() {
       <h1 className="text-2xl font-extrabold">Effectif</h1>
       {[...groupes.entries()].map(([categorie, membres]) => (
         <section key={categorie} className="mt-8">
-          <h2 className="text-lg font-bold text-club-green">{categorie}</h2>
+          <h2 className="text-lg font-bold text-club-gold">{categorie}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {membres.map((joueur) => (
               <PlayerCard key={joueur.id} joueur={joueur} />

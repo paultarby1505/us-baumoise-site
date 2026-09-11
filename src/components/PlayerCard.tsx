@@ -3,7 +3,7 @@ import type { Joueur } from "@/lib/types";
 export default function PlayerCard({ joueur }: { joueur: Joueur }) {
   return (
     <div className="flex items-center gap-4 rounded-lg border border-black/10 p-4">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-club-green text-lg font-bold text-white">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-club-black text-lg font-bold text-white">
         {joueur.numero ?? "-"}
       </div>
       <div>

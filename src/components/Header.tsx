@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ClubCrest from "@/components/ClubCrest";
+import Image from "next/image";
 import { siteConfig } from "@/lib/config";
 
 const links = [
@@ -14,7 +14,7 @@ export default function Header() {
     <header className="bg-club-black text-white border-b-2 border-club-gold">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-3">
-          <ClubCrest size={44} />
+          <Image src="/logo.png" alt="" width={70} height={44} className="h-11 w-auto" priority />
           <span className="text-lg font-bold tracking-wide">
             {siteConfig.shortName}
           </span>

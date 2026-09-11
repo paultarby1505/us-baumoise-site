@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getActualites, getMatchs, getProchainsMatchs } from "@/lib/queries";
+import Image from "next/image";
 import NewsCard from "@/components/NewsCard";
 import MatchCard from "@/components/MatchCard";
-import ClubCrest from "@/components/ClubCrest";
 import { siteConfig } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export default async function HomePage() {
     <div>
       <section className="bg-club-black text-white">
         <div className="mx-auto flex max-w-5xl flex-col items-center px-4 py-16 text-center">
-          <ClubCrest size={120} />
+          <Image src="/logo.png" alt={siteConfig.name} width={224} height={140} className="h-36 w-auto" priority />
           <h1 className="mt-6 text-3xl font-extrabold sm:text-4xl">{siteConfig.name}</h1>
           <p className="mt-3 max-w-2xl text-white/80">{siteConfig.description}</p>
         </div>

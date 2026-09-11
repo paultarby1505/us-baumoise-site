@@ -1,0 +1,45 @@
+import type { Metadata } from "next";
+import { getJoueurs } from "@/lib/queries";
+import PlayerCard from "@/components/PlayerCard";
+import type { Joueur } from "@/lib/types";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Effectif",
+  description: "L'effectif du club US Baumoise Rugby, par catégorie.",
+};
+
+function groupByCategorie(joueurs: Joueur[]) {
+  const groupes = new Map<string, Joueur[]>();
+  for (const joueur of joueurs) {
+    const liste = groupes.get(joueur.categorie) ?? [];
+    liste.push(joueur);
+    groupes.set(joueur.categorie, liste);
+  }
+  return groupes;
+}
+
+export default async function EffectifPage() {
+  const joueurs = await getJoueurs();
+  const groupes = groupByCategorie(joueurs);
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-10">
+      <h1 className="text-2xl font-extrabold">Effectif</h1>
+      {[...groupes.entries()].map(([categorie, membres]) => (
+        <section key={categorie} className="mt-8">
+          <h2 className="text-lg font-bold text-club-green">{categorie}</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {membres.map((joueur) => (
+              <PlayerCard key={joueur.id} joueur={joueur} />
+            ))}
+          </div>
+        </section>
+      ))}
+      {joueurs.length === 0 && (
+        <p className="mt-6 text-foreground/60">Effectif à venir.</p>
+      )}
+    </div>
+  );
+}

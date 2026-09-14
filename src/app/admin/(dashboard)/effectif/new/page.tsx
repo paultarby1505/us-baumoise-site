@@ -64,18 +64,18 @@ export default async function NewJoueurPage({
         </div>
         <label className="block text-sm font-medium">
           Poste (optionnel)
-          <select
+          <input
+            type="text"
             name="poste"
-            defaultValue=""
-            className="mt-1 w-full rounded border border-black/20 bg-white px-3 py-2"
-          >
-            <option value="">— Non renseigné —</option>
+            list="postes-suggestions"
+            placeholder="Choisis dans la liste ou tape un autre poste"
+            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
+          />
+          <datalist id="postes-suggestions">
             {POSTES.map((poste) => (
-              <option key={poste} value={poste}>
-                {poste}
-              </option>
+              <option key={poste} value={poste} />
             ))}
-          </select>
+          </datalist>
         </label>
         <ImagePickerField
           name="photo"

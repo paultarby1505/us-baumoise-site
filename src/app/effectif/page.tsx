@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getJoueurs } from "@/lib/queries";
 import PlayerCard from "@/components/PlayerCard";
-import { categoryRank, categorySlug } from "@/lib/rugby";
+import { categoryRank, categorySlug, posteRank } from "@/lib/rugby";
 import type { Joueur } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +17,9 @@ function groupByCategorie(joueurs: Joueur[]) {
     const liste = groupes.get(joueur.categorie) ?? [];
     liste.push(joueur);
     groupes.set(joueur.categorie, liste);
+  }
+  for (const membres of groupes.values()) {
+    membres.sort((a, b) => posteRank(a.poste) - posteRank(b.poste));
   }
   return [...groupes.entries()].sort(
     ([a], [b]) => categoryRank(a) - categoryRank(b)

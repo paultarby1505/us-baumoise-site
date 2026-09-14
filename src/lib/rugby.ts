@@ -28,6 +28,12 @@ export function categoryRank(categorie: string): number {
   return index === -1 ? CATEGORIES.length : index;
 }
 
+export function posteRank(poste: string | null): number {
+  if (!poste) return POSTES.length + 1;
+  const index = POSTES.indexOf(poste as (typeof POSTES)[number]);
+  return index === -1 ? POSTES.length : index;
+}
+
 export function categorySlug(categorie: string): string {
   return categorie.toLowerCase();
 }

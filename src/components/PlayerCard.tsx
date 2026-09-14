@@ -4,7 +4,7 @@ import type { Joueur } from "@/lib/types";
 export default function PlayerCard({ joueur }: { joueur: Joueur }) {
   return (
     <div className="overflow-hidden rounded-lg border border-black/10 bg-white">
-      <div className="relative aspect-square w-full bg-club-black-soft">
+      <div className="relative aspect-[3/4] w-full bg-club-black-soft">
         {joueur.photo_url ? (
           <Image
             src={joueur.photo_url}

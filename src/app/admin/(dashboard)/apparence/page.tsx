@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getSiteSettings } from "@/lib/queries";
 import { updateHeroImage, removeHeroImage } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import ImagePickerField from "@/components/ImagePickerField";
 
 export default async function ApparencePage({
   searchParams,
@@ -40,20 +41,12 @@ export default async function ApparencePage({
       )}
 
       <form action={updateHeroImage} className="mt-6 max-w-md space-y-4">
-        <label className="block text-sm font-medium">
-          {settings?.hero_image_url ? "Remplacer la photo" : "Choisir une photo"}
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            required
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
-        <p className="text-xs text-foreground/50">
-          Une image large et pas trop chargée fonctionne mieux (le texte du site
-          s&apos;affiche par-dessus, avec un fond assombri automatique).
-        </p>
+        <ImagePickerField
+          name="image"
+          label={settings?.hero_image_url ? "Remplacer la photo" : "Choisir une photo"}
+          required
+          helpText="Une image large et pas trop chargée fonctionne mieux (le texte du site s'affiche par-dessus, avec un fond assombri automatique)."
+        />
         <button
           type="submit"
           className="rounded bg-club-gold px-4 py-2 font-semibold text-black hover:bg-club-gold-light"

@@ -1,5 +1,6 @@
 import { createJoueur } from "@/app/admin/actions";
 import { CATEGORIES, POSTES } from "@/lib/rugby";
+import ImagePickerField from "@/components/ImagePickerField";
 
 export default async function NewJoueurPage({
   searchParams,
@@ -76,18 +77,11 @@ export default async function NewJoueurPage({
             ))}
           </select>
         </label>
-        <label className="block text-sm font-medium">
-          Photo (optionnelle)
-          <input
-            type="file"
-            name="photo"
-            accept="image/*"
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-          <span className="mt-1 block text-xs text-foreground/50">
-            Si aucune photo n&apos;est fournie, une silhouette par défaut sera affichée.
-          </span>
-        </label>
+        <ImagePickerField
+          name="photo"
+          label="Photo (optionnelle)"
+          helpText="Si aucune photo n'est fournie, une silhouette par défaut sera affichée."
+        />
         <button
           type="submit"
           className="rounded bg-club-gold px-4 py-2 font-semibold text-black hover:bg-club-gold-light"

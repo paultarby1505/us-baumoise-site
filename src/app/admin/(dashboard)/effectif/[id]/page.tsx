@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { updateJoueur, deleteJoueur } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import { CATEGORIES, POSTES } from "@/lib/rugby";
+import ImagePickerField from "@/components/ImagePickerField";
 
 export default async function EditJoueurPage({
   params,
@@ -107,15 +108,10 @@ export default async function EditJoueurPage({
             ))}
           </select>
         </label>
-        <label className="block text-sm font-medium">
-          {joueur.photo_url ? "Remplacer la photo" : "Photo (optionnelle)"}
-          <input
-            type="file"
-            name="photo"
-            accept="image/*"
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
+        <ImagePickerField
+          name="photo"
+          label={joueur.photo_url ? "Remplacer la photo" : "Photo (optionnelle)"}
+        />
         <button
           type="submit"
           className="rounded bg-club-gold px-4 py-2 font-semibold text-black hover:bg-club-gold-light"

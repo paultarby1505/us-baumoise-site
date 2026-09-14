@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { updateActualite, deleteActualite } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import ImagePickerField from "@/components/ImagePickerField";
 
 export default async function EditActualitePage({
   params,
@@ -71,15 +72,10 @@ export default async function EditActualitePage({
             className="mt-1 w-full rounded border border-black/20 px-3 py-2"
           />
         </label>
-        <label className="block text-sm font-medium">
-          {actualite.image_url ? "Remplacer la photo" : "Photo (optionnelle)"}
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
+        <ImagePickerField
+          name="image"
+          label={actualite.image_url ? "Remplacer la photo" : "Photo (optionnelle)"}
+        />
         <div className="flex items-center gap-4">
           <button
             type="submit"

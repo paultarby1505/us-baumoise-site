@@ -22,24 +22,37 @@ function intOrNull(formData: FormData, key: string): number | null {
   return Number.isNaN(n) ? null : n;
 }
 
-async function uploadPhotoIfProvided(
+async function uploadImageIfProvided(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
   formData: FormData,
-  joueurId: string
+  fieldName: string,
+  bucket: string,
+  basePath: string
 ): Promise<string | undefined> {
-  const file = formData.get("photo");
+  const file = formData.get(fieldName);
   if (!(file instanceof File) || file.size === 0) return undefined;
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${joueurId}.${ext}`;
+  const path = `${basePath}.${ext}`;
 
   const { error } = await supabase.storage
-    .from("joueurs-photos")
+    .from(bucket)
     .upload(path, file, { upsert: true, contentType: file.type });
   if (error) throw error;
 
-  const { data } = supabase.storage.from("joueurs-photos").getPublicUrl(path);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return `${data.publicUrl}?v=${Date.now()}`;
+}
+
+async function removeStoredImages(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  bucket: string,
+  id: string
+) {
+  const { data: files } = await supabase.storage.from(bucket).list("", { search: id });
+  if (files && files.length > 0) {
+    await supabase.storage.from(bucket).remove(files.map((f) => f.name));
+  }
 }
 
 // --- Auth ---
@@ -148,12 +161,26 @@ export async function createActualite(formData: FormData) {
   const titre = str(formData, "titre");
   const supabase = await createServerSupabaseClient();
   const slug = await uniqueSlug(supabase, titre);
+  const id = crypto.randomUUID();
+
+  let imageUrl: string | undefined;
+  try {
+    imageUrl = await uploadImageIfProvided(supabase, formData, "image", "actualites-photos", id);
+  } catch (e) {
+    redirect(
+      `/admin/actualites/new?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi de la photo"
+      )}`
+    );
+  }
 
   const { error } = await supabase.from("actualites").insert({
+    id,
     titre,
     slug,
     extrait: strOrNull(formData, "extrait"),
     contenu: str(formData, "contenu"),
+    image_url: imageUrl ?? null,
   });
   if (error) redirect(`/admin/actualites/new?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/actualites");
@@ -161,14 +188,26 @@ export async function createActualite(formData: FormData) {
 
 export async function updateActualite(id: string, formData: FormData) {
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase
-    .from("actualites")
-    .update({
-      titre: str(formData, "titre"),
-      extrait: strOrNull(formData, "extrait"),
-      contenu: str(formData, "contenu"),
-    })
-    .eq("id", id);
+
+  let imageUrl: string | undefined;
+  try {
+    imageUrl = await uploadImageIfProvided(supabase, formData, "image", "actualites-photos", id);
+  } catch (e) {
+    redirect(
+      `/admin/actualites/${id}?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi de la photo"
+      )}`
+    );
+  }
+
+  const updateData: Record<string, unknown> = {
+    titre: str(formData, "titre"),
+    extrait: strOrNull(formData, "extrait"),
+    contenu: str(formData, "contenu"),
+  };
+  if (imageUrl) updateData.image_url = imageUrl;
+
+  const { error } = await supabase.from("actualites").update(updateData).eq("id", id);
   if (error) redirect(`/admin/actualites/${id}?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/actualites");
 }
@@ -176,6 +215,7 @@ export async function updateActualite(id: string, formData: FormData) {
 export async function deleteActualite(id: string) {
   const supabase = await createServerSupabaseClient();
   await supabase.from("actualites").delete().eq("id", id);
+  await removeStoredImages(supabase, "actualites-photos", id);
   redirect("/admin/actualites");
 }
 
@@ -187,7 +227,7 @@ export async function createJoueur(formData: FormData) {
 
   let photoUrl: string | undefined;
   try {
-    photoUrl = await uploadPhotoIfProvided(supabase, formData, id);
+    photoUrl = await uploadImageIfProvided(supabase, formData, "photo", "joueurs-photos", id);
   } catch (e) {
     redirect(
       `/admin/effectif/new?error=${encodeURIComponent(
@@ -214,7 +254,7 @@ export async function updateJoueur(id: string, formData: FormData) {
 
   let photoUrl: string | undefined;
   try {
-    photoUrl = await uploadPhotoIfProvided(supabase, formData, id);
+    photoUrl = await uploadImageIfProvided(supabase, formData, "photo", "joueurs-photos", id);
   } catch (e) {
     redirect(
       `/admin/effectif/${id}?error=${encodeURIComponent(
@@ -240,14 +280,7 @@ export async function updateJoueur(id: string, formData: FormData) {
 export async function deleteJoueur(id: string) {
   const supabase = await createServerSupabaseClient();
   await supabase.from("joueurs").delete().eq("id", id);
-  const { data: files } = await supabase.storage.from("joueurs-photos").list("", {
-    search: id,
-  });
-  if (files && files.length > 0) {
-    await supabase.storage
-      .from("joueurs-photos")
-      .remove(files.map((f) => f.name));
-  }
+  await removeStoredImages(supabase, "joueurs-photos", id);
   redirect("/admin/effectif");
 }
 
@@ -305,4 +338,41 @@ export async function deleteMatch(id: string) {
   const supabase = await createServerSupabaseClient();
   await supabase.from("matchs").delete().eq("id", id);
   redirect("/admin/matchs");
+}
+
+// --- Apparence du site ---
+
+export async function updateHeroImage(formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+
+  let imageUrl: string | undefined;
+  try {
+    imageUrl = await uploadImageIfProvided(supabase, formData, "image", "site-images", "hero");
+  } catch (e) {
+    redirect(
+      `/admin/apparence?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi de la photo"
+      )}`
+    );
+  }
+
+  if (!imageUrl) {
+    redirect(`/admin/apparence?error=${encodeURIComponent("Choisis une image.")}`);
+  }
+
+  const { error } = await supabase
+    .from("site_settings")
+    .update({ hero_image_url: imageUrl, updated_at: new Date().toISOString() })
+    .eq("id", 1);
+  if (error) redirect(`/admin/apparence?error=${encodeURIComponent(error.message)}`);
+  redirect("/admin/apparence?success=1");
+}
+
+export async function removeHeroImage() {
+  const supabase = await createServerSupabaseClient();
+  await supabase
+    .from("site_settings")
+    .update({ hero_image_url: null, updated_at: new Date().toISOString() })
+    .eq("id", 1);
+  redirect("/admin/apparence");
 }

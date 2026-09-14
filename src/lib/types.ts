@@ -31,3 +31,9 @@ export type Match = {
   score_adverse: number | null;
   created_at: string;
 };
+
+export type SiteSettings = {
+  id: number;
+  hero_image_url: string | null;
+  updated_at: string;
+};

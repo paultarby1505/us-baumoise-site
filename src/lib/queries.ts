@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Actualite, Joueur, Match } from "./types";
+import type { Actualite, Joueur, Match, SiteSettings } from "./types";
 
 export async function getActualites(): Promise<Actualite[]> {
   const { data, error } = await supabase
@@ -36,6 +36,16 @@ export async function getMatchs(): Promise<Match[]> {
     .order("date_match", { ascending: true });
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("*")
+    .eq("id", 1)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
 }
 
 export function getProchainsMatchs(matchs: Match[]): Match[] {

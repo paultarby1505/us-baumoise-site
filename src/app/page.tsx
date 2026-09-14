@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { getActualites, getMatchs, getProchainsMatchs } from "@/lib/queries";
 import Image from "next/image";
+import { getActualites, getMatchs, getProchainsMatchs, getSiteSettings } from "@/lib/queries";
 import NewsCard from "@/components/NewsCard";
 import MatchCard from "@/components/MatchCard";
 import { siteConfig } from "@/lib/config";
@@ -8,14 +8,32 @@ import { siteConfig } from "@/lib/config";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [actualites, matchs] = await Promise.all([getActualites(), getMatchs()]);
+  const [actualites, matchs, settings] = await Promise.all([
+    getActualites(),
+    getMatchs(),
+    getSiteSettings(),
+  ]);
   const prochainMatch = getProchainsMatchs(matchs)[0];
   const dernieresActus = actualites.slice(0, 3);
+  const heroImage = settings?.hero_image_url;
 
   return (
     <div>
-      <section className="bg-club-black text-white">
-        <div className="mx-auto flex max-w-5xl flex-col items-center px-4 py-16 text-center">
+      <section className="relative overflow-hidden bg-club-black text-white">
+        {heroImage && (
+          <>
+            <Image
+              src={heroImage}
+              alt=""
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-club-black/70" />
+          </>
+        )}
+        <div className="relative mx-auto flex max-w-5xl flex-col items-center px-4 py-16 text-center">
           <Image src="/logo.png" alt={siteConfig.name} width={224} height={140} className="h-36 w-auto" priority />
           <h1 className="mt-6 text-3xl font-extrabold sm:text-4xl">{siteConfig.name}</h1>
           <p className="mt-3 max-w-2xl text-white/80">{siteConfig.description}</p>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getActualite } from "@/lib/queries";
 
@@ -44,6 +45,18 @@ export default async function ActualitePage({
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
+      {actualite.image_url && (
+        <div className="relative mb-8 aspect-[16/9] w-full overflow-hidden rounded-lg">
+          <Image
+            src={actualite.image_url}
+            alt=""
+            fill
+            priority
+            className="object-cover"
+            sizes="(min-width: 768px) 768px, 100vw"
+          />
+        </div>
+      )}
       <p className="text-xs font-semibold uppercase tracking-wide text-club-gold">
         {formatDate(actualite.publie_le)}
       </p>

@@ -17,6 +17,11 @@ const sections = [
     label: "Matchs",
     description: "Gérer le calendrier et les résultats.",
   },
+  {
+    href: "/admin/apparence",
+    label: "Apparence",
+    description: "Changer la photo de fond de la page d'accueil.",
+  },
 ];
 
 export default async function AdminHomePage({

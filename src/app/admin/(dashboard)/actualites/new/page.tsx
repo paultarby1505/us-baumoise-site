@@ -40,6 +40,15 @@ export default async function NewActualitePage({
             className="mt-1 w-full rounded border border-black/20 px-3 py-2"
           />
         </label>
+        <label className="block text-sm font-medium">
+          Photo (optionnelle)
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
+          />
+        </label>
         <button
           type="submit"
           className="rounded bg-club-gold px-4 py-2 font-semibold text-black hover:bg-club-gold-light"

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getJoueurs } from "@/lib/queries";
 import PlayerCard from "@/components/PlayerCard";
-import { categoryRank } from "@/lib/rugby";
+import { categoryRank, categorySlug } from "@/lib/rugby";
 import type { Joueur } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,7 @@ export default async function EffectifPage() {
     <div className="mx-auto max-w-5xl px-4 py-10">
       <h1 className="text-2xl font-extrabold">Effectif</h1>
       {groupes.map(([categorie, membres]) => (
-        <section key={categorie} className="mt-8">
+        <section key={categorie} id={categorySlug(categorie)} className="mt-8 scroll-mt-6">
           <h2 className="text-lg font-bold text-club-gold">{categorie}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {membres.map((joueur) => (

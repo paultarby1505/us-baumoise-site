@@ -1,13 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { siteConfig } from "@/lib/config";
-
-const links = [
-  { href: "/", label: "Accueil" },
-  { href: "/actualites", label: "Actualités" },
-  { href: "/effectif", label: "Effectif" },
-  { href: "/matchs", label: "Matchs" },
-];
+import { CATEGORIES, categorySlug } from "@/lib/rugby";
 
 export default function Header() {
   return (
@@ -19,16 +13,36 @@ export default function Header() {
             {siteConfig.shortName}
           </span>
         </Link>
-        <nav className="flex gap-5 text-sm font-medium uppercase tracking-wide">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="transition-colors hover:text-club-gold-light"
-            >
-              {link.label}
+        <nav className="flex items-center gap-5 text-sm font-medium uppercase tracking-wide">
+          <Link href="/" className="transition-colors hover:text-club-gold-light">
+            Accueil
+          </Link>
+          <Link href="/actualites" className="transition-colors hover:text-club-gold-light">
+            Actualités
+          </Link>
+
+          <div className="group relative">
+            <Link href="/effectif" className="transition-colors hover:text-club-gold-light">
+              Effectif
             </Link>
-          ))}
+            <div className="invisible absolute left-1/2 top-full z-10 w-44 -translate-x-1/2 pt-3 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
+              <div className="overflow-hidden rounded-md border border-white/10 bg-club-black-soft py-2 shadow-lg">
+                {CATEGORIES.map((cat) => (
+                  <Link
+                    key={cat}
+                    href={`/effectif#${categorySlug(cat)}`}
+                    className="block px-4 py-1.5 text-xs normal-case tracking-normal text-white/80 transition-colors hover:bg-club-black hover:text-club-gold-light"
+                  >
+                    {cat}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <Link href="/matchs" className="transition-colors hover:text-club-gold-light">
+            Matchs
+          </Link>
         </nav>
       </div>
     </header>

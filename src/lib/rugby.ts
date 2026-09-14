@@ -27,3 +27,7 @@ export function categoryRank(categorie: string): number {
   const index = CATEGORIES.indexOf(categorie as (typeof CATEGORIES)[number]);
   return index === -1 ? CATEGORIES.length : index;
 }
+
+export function categorySlug(categorie: string): string {
+  return categorie.toLowerCase();
+}

@@ -1,5 +1,6 @@
 import { createActualite } from "@/app/admin/actions";
 import ImagePickerField from "@/components/ImagePickerField";
+import MultiImagePickerField from "@/components/MultiImagePickerField";
 
 export default async function NewActualitePage({
   searchParams,
@@ -41,7 +42,12 @@ export default async function NewActualitePage({
             className="mt-1 w-full rounded border border-black/20 px-3 py-2"
           />
         </label>
-        <ImagePickerField name="image" label="Photo (optionnelle)" />
+        <ImagePickerField name="image" label="Photo de couverture (optionnelle)" />
+        <MultiImagePickerField
+          name="photos"
+          label="Photos supplémentaires pour la galerie (optionnel)"
+          helpText="Tu peux en sélectionner plusieurs d'un coup. Elles apparaîtront sur l'article et dans la Galerie du site."
+        />
         <button
           type="submit"
           className="rounded bg-club-gold px-4 py-2 font-semibold text-black hover:bg-club-gold-light"

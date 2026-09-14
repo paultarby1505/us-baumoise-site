@@ -37,3 +37,15 @@ export type SiteSettings = {
   hero_image_url: string | null;
   updated_at: string;
 };
+
+export type ActualitePhoto = {
+  id: string;
+  actualite_id: string;
+  url: string;
+  position: number;
+  created_at: string;
+};
+
+export type GalleryPhoto = ActualitePhoto & {
+  actualite: { titre: string; slug: string } | null;
+};

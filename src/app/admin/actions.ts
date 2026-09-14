@@ -55,6 +55,49 @@ async function removeStoredImages(
   }
 }
 
+const GALLERY_BUCKET = "actualites-photos";
+const GALLERY_PUBLIC_MARKER = `/public/${GALLERY_BUCKET}/`;
+
+async function uploadGalleryPhotos(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  formData: FormData,
+  fieldName: string,
+  actualiteId: string,
+  startPosition: number
+): Promise<{ actualite_id: string; url: string; position: number }[]> {
+  const files = formData
+    .getAll(fieldName)
+    .filter((f): f is File => f instanceof File && f.size > 0);
+
+  const rows: { actualite_id: string; url: string; position: number }[] = [];
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `gallery/${actualiteId}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage
+      .from(GALLERY_BUCKET)
+      .upload(path, file, { contentType: file.type });
+    if (error) throw error;
+    const { data } = supabase.storage.from(GALLERY_BUCKET).getPublicUrl(path);
+    rows.push({ actualite_id: actualiteId, url: data.publicUrl, position: startPosition + i });
+  }
+  return rows;
+}
+
+async function removeGalleryFolder(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  actualiteId: string
+) {
+  const { data: files } = await supabase.storage
+    .from(GALLERY_BUCKET)
+    .list(`gallery/${actualiteId}`);
+  if (files && files.length > 0) {
+    await supabase.storage
+      .from(GALLERY_BUCKET)
+      .remove(files.map((f) => `gallery/${actualiteId}/${f.name}`));
+  }
+}
+
 // --- Auth ---
 
 export async function login(formData: FormData) {
@@ -183,6 +226,20 @@ export async function createActualite(formData: FormData) {
     image_url: imageUrl ?? null,
   });
   if (error) redirect(`/admin/actualites/new?error=${encodeURIComponent(error.message)}`);
+
+  try {
+    const galleryRows = await uploadGalleryPhotos(supabase, formData, "photos", id, 0);
+    if (galleryRows.length > 0) {
+      await supabase.from("actualite_photos").insert(galleryRows);
+    }
+  } catch (e) {
+    redirect(
+      `/admin/actualites/${id}?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi des photos"
+      )}`
+    );
+  }
+
   redirect("/admin/actualites");
 }
 
@@ -209,13 +266,53 @@ export async function updateActualite(id: string, formData: FormData) {
 
   const { error } = await supabase.from("actualites").update(updateData).eq("id", id);
   if (error) redirect(`/admin/actualites/${id}?error=${encodeURIComponent(error.message)}`);
+
+  try {
+    const { count } = await supabase
+      .from("actualite_photos")
+      .select("id", { count: "exact", head: true })
+      .eq("actualite_id", id);
+    const galleryRows = await uploadGalleryPhotos(supabase, formData, "photos", id, count ?? 0);
+    if (galleryRows.length > 0) {
+      await supabase.from("actualite_photos").insert(galleryRows);
+    }
+  } catch (e) {
+    redirect(
+      `/admin/actualites/${id}?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi des photos"
+      )}`
+    );
+  }
+
   redirect("/admin/actualites");
+}
+
+export async function deleteActualitePhoto(photoId: string, actualiteId: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data: photo } = await supabase
+    .from("actualite_photos")
+    .select("url")
+    .eq("id", photoId)
+    .maybeSingle();
+
+  await supabase.from("actualite_photos").delete().eq("id", photoId);
+
+  if (photo?.url) {
+    const idx = photo.url.indexOf(GALLERY_PUBLIC_MARKER);
+    if (idx !== -1) {
+      const path = photo.url.slice(idx + GALLERY_PUBLIC_MARKER.length);
+      await supabase.storage.from(GALLERY_BUCKET).remove([path]);
+    }
+  }
+
+  redirect(`/admin/actualites/${actualiteId}`);
 }
 
 export async function deleteActualite(id: string) {
   const supabase = await createServerSupabaseClient();
   await supabase.from("actualites").delete().eq("id", id);
   await removeStoredImages(supabase, "actualites-photos", id);
+  await removeGalleryFolder(supabase, id);
   redirect("/admin/actualites");
 }
 

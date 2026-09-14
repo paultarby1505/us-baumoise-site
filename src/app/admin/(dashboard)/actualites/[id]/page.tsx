@@ -1,9 +1,15 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { updateActualite, deleteActualite } from "@/app/admin/actions";
+import { getActualitePhotos } from "@/lib/queries";
+import {
+  updateActualite,
+  deleteActualite,
+  deleteActualitePhoto,
+} from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import ImagePickerField from "@/components/ImagePickerField";
+import MultiImagePickerField from "@/components/MultiImagePickerField";
 
 export default async function EditActualitePage({
   params,
@@ -22,6 +28,8 @@ export default async function EditActualitePage({
     .maybeSingle();
 
   if (!actualite) notFound();
+
+  const photos = await getActualitePhotos(id);
 
   return (
     <div>
@@ -74,7 +82,12 @@ export default async function EditActualitePage({
         </label>
         <ImagePickerField
           name="image"
-          label={actualite.image_url ? "Remplacer la photo" : "Photo (optionnelle)"}
+          label={actualite.image_url ? "Remplacer la photo de couverture" : "Photo de couverture (optionnelle)"}
+        />
+        <MultiImagePickerField
+          name="photos"
+          label="Ajouter des photos à la galerie de cet article"
+          helpText="Elles s'ajoutent à celles déjà présentes ci-dessous."
         />
         <div className="flex items-center gap-4">
           <button
@@ -85,7 +98,32 @@ export default async function EditActualitePage({
           </button>
         </div>
       </form>
-      <form action={deleteActualite.bind(null, id)} className="mt-4 max-w-xl">
+
+      {photos.length > 0 && (
+        <div className="mt-8 max-w-xl">
+          <h2 className="text-sm font-semibold">Photos de la galerie ({photos.length})</h2>
+          <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
+            {photos.map((photo) => (
+              <div key={photo.id} className="group relative aspect-square overflow-hidden rounded border border-black/10">
+                <Image src={photo.url} alt="" fill className="object-cover" sizes="150px" />
+                <form
+                  action={deleteActualitePhoto.bind(null, photo.id, id)}
+                  className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-opacity group-hover:bg-black/50 group-hover:opacity-100"
+                >
+                  <ConfirmSubmitButton
+                    confirmMessage="Retirer cette photo de la galerie ?"
+                    className="rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white"
+                  >
+                    Retirer
+                  </ConfirmSubmitButton>
+                </form>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <form action={deleteActualite.bind(null, id)} className="mt-8 max-w-xl">
         <ConfirmSubmitButton
           confirmMessage={`Supprimer l'actualité "${actualite.titre}" ?`}
           className="text-sm text-red-600 hover:underline"

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getActualite } from "@/lib/queries";
+import { getActualite, getActualitePhotos } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +42,7 @@ export default async function ActualitePage({
   const { slug } = await params;
   const actualite = await getActualite(slug);
   if (!actualite) notFound();
+  const photos = await getActualitePhotos(actualite.id);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
@@ -66,6 +67,33 @@ export default async function ActualitePage({
       <div className="mt-6 whitespace-pre-line text-foreground/80 leading-relaxed">
         {actualite.contenu}
       </div>
+
+      {photos.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-sm font-bold uppercase tracking-wide text-club-gold">
+            Photos
+          </h2>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {photos.map((photo) => (
+              <a
+                key={photo.id}
+                href={photo.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative block aspect-square overflow-hidden rounded-lg"
+              >
+                <Image
+                  src={photo.url}
+                  alt=""
+                  fill
+                  className="object-cover transition-transform hover:scale-105"
+                  sizes="(min-width: 640px) 33vw, 50vw"
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </article>
   );
 }

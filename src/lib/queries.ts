@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Actualite, Joueur, Match, SiteSettings } from "./types";
+import type { Actualite, ActualitePhoto, GalleryPhoto, Joueur, Match, SiteSettings } from "./types";
 
 export async function getActualites(): Promise<Actualite[]> {
   const { data, error } = await supabase
@@ -36,6 +36,25 @@ export async function getMatchs(): Promise<Match[]> {
     .order("date_match", { ascending: true });
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getActualitePhotos(actualiteId: string): Promise<ActualitePhoto[]> {
+  const { data, error } = await supabase
+    .from("actualite_photos")
+    .select("*")
+    .eq("actualite_id", actualiteId)
+    .order("position", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
+  const { data, error } = await supabase
+    .from("actualite_photos")
+    .select("*, actualite:actualites(titre, slug)")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as GalleryPhoto[];
 }
 
 export async function getSiteSettings(): Promise<SiteSettings | null> {

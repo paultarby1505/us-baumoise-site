@@ -43,6 +43,9 @@ export default function Header() {
           <Link href="/matchs" className="transition-colors hover:text-club-gold-light">
             Matchs
           </Link>
+          <Link href="/galerie" className="transition-colors hover:text-club-gold-light">
+            Galerie
+          </Link>
         </nav>
       </div>
     </header>

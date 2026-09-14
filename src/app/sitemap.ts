@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteConfig.url}/actualites`, changeFrequency: "daily", priority: 0.8 },
     { url: `${siteConfig.url}/effectif`, changeFrequency: "weekly", priority: 0.6 },
     { url: `${siteConfig.url}/matchs`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${siteConfig.url}/galerie`, changeFrequency: "weekly", priority: 0.5 },
   ];
 
   const newsRoutes: MetadataRoute.Sitemap = actualites.map((actu) => ({

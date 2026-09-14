@@ -20,12 +20,20 @@ export default async function AdminEffectifPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-extrabold">Effectif</h1>
-        <Link
-          href="/admin/effectif/new"
-          className="rounded bg-club-gold px-4 py-2 text-sm font-semibold text-black hover:bg-club-gold-light"
-        >
-          + Nouveau joueur
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/admin/effectif/categories"
+            className="rounded border border-club-gold px-4 py-2 text-sm font-semibold text-club-gold hover:bg-club-gold/10"
+          >
+            En-têtes des catégories
+          </Link>
+          <Link
+            href="/admin/effectif/new"
+            className="rounded bg-club-gold px-4 py-2 text-sm font-semibold text-black hover:bg-club-gold-light"
+          >
+            + Nouveau joueur
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6 divide-y divide-black/10 rounded-lg border border-black/10 bg-white">

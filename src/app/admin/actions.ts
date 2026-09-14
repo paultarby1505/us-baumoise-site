@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createEphemeralSupabaseClient } from "@/lib/supabase-ephemeral";
 import { getCurrentProfile } from "@/lib/auth";
 import { slugify } from "@/lib/slugify";
+import { CATEGORIES, categorySlug } from "@/lib/rugby";
 
 function str(formData: FormData, key: string): string {
   return String(formData.get(key) ?? "").trim();
@@ -472,4 +473,57 @@ export async function removeHeroImage() {
     .update({ hero_image_url: null, updated_at: new Date().toISOString() })
     .eq("id", 1);
   redirect("/admin/apparence");
+}
+
+// --- En-têtes des pages de catégorie (effectif) ---
+
+export async function updateCategorieHeader(categorie: string, formData: FormData) {
+  if (!CATEGORIES.includes(categorie as (typeof CATEGORIES)[number])) {
+    redirect(`/admin/effectif/categories?error=${encodeURIComponent("Catégorie inconnue.")}`);
+  }
+  const supabase = await createServerSupabaseClient();
+  const slug = categorySlug(categorie);
+
+  let imageUrl: string | undefined;
+  try {
+    imageUrl = await uploadImageIfProvided(
+      supabase,
+      formData,
+      "image",
+      "site-images",
+      `categorie-${slug}`
+    );
+  } catch (e) {
+    redirect(
+      `/admin/effectif/categories/${slug}?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi de la photo"
+      )}`
+    );
+  }
+
+  const upsertData: Record<string, unknown> = {
+    categorie,
+    header_titre: strOrNull(formData, "header_titre"),
+    header_texte: strOrNull(formData, "header_texte"),
+    updated_at: new Date().toISOString(),
+  };
+  if (imageUrl) upsertData.header_image_url = imageUrl;
+
+  const { error } = await supabase
+    .from("categorie_pages")
+    .upsert(upsertData, { onConflict: "categorie" });
+  if (error) {
+    redirect(`/admin/effectif/categories/${slug}?error=${encodeURIComponent(error.message)}`);
+  }
+  redirect(`/admin/effectif/categories/${slug}?success=1`);
+}
+
+export async function removeCategorieHeaderImage(categorie: string) {
+  const supabase = await createServerSupabaseClient();
+  const slug = categorySlug(categorie);
+  await supabase
+    .from("categorie_pages")
+    .update({ header_image_url: null, updated_at: new Date().toISOString() })
+    .eq("categorie", categorie);
+  redirect(`/admin/effectif/categories/${slug}`);
 }

@@ -30,7 +30,7 @@ export default function Header() {
                 {CATEGORIES.map((cat) => (
                   <Link
                     key={cat}
-                    href={`/effectif#${categorySlug(cat)}`}
+                    href={`/effectif/${categorySlug(cat)}`}
                     className="block px-4 py-1.5 text-xs normal-case tracking-normal text-white/80 transition-colors hover:bg-club-black hover:text-club-gold-light"
                   >
                     {cat}

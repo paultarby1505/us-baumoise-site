@@ -37,3 +37,8 @@ export function posteRank(poste: string | null): number {
 export function categorySlug(categorie: string): string {
   return categorie.toLowerCase();
 }
+
+export function categoryFromSlug(slug: string): (typeof CATEGORIES)[number] | null {
+  const normalized = slug.toLowerCase();
+  return CATEGORIES.find((cat) => categorySlug(cat) === normalized) ?? null;
+}

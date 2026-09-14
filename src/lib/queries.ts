@@ -1,5 +1,13 @@
 import { supabase } from "./supabase";
-import type { Actualite, ActualitePhoto, GalleryPhoto, Joueur, Match, SiteSettings } from "./types";
+import type {
+  Actualite,
+  ActualitePhoto,
+  CategoriePage,
+  GalleryPhoto,
+  Joueur,
+  Match,
+  SiteSettings,
+} from "./types";
 
 export async function getActualites(): Promise<Actualite[]> {
   const { data, error } = await supabase
@@ -65,6 +73,22 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
     .maybeSingle();
   if (error) throw error;
   return data;
+}
+
+export async function getCategoriePage(categorie: string): Promise<CategoriePage | null> {
+  const { data, error } = await supabase
+    .from("categorie_pages")
+    .select("*")
+    .eq("categorie", categorie)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function getCategoriePages(): Promise<CategoriePage[]> {
+  const { data, error } = await supabase.from("categorie_pages").select("*");
+  if (error) throw error;
+  return data ?? [];
 }
 
 export function getProchainsMatchs(matchs: Match[]): Match[] {

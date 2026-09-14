@@ -49,3 +49,11 @@ export type ActualitePhoto = {
 export type GalleryPhoto = ActualitePhoto & {
   actualite: { titre: string; slug: string } | null;
 };
+
+export type CategoriePage = {
+  categorie: string;
+  header_image_url: string | null;
+  header_titre: string | null;
+  header_texte: string | null;
+  updated_at: string;
+};

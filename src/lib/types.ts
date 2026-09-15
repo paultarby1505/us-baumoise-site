@@ -60,3 +60,15 @@ export type CategoriePage = {
   header_texte: string | null;
   updated_at: string;
 };
+
+export type Partenaire = {
+  id: string;
+  nom: string;
+  slug: string;
+  logo_url: string | null;
+  resume: string | null;
+  description: string | null;
+  site_url: string | null;
+  ordre: number;
+  created_at: string;
+};

@@ -6,6 +6,7 @@ import type {
   GalleryPhoto,
   Joueur,
   Match,
+  Partenaire,
   SiteSettings,
 } from "./types";
 
@@ -112,6 +113,26 @@ export async function getCategoriePages(): Promise<CategoriePage[]> {
   const { data, error } = await supabase.from("categorie_pages").select("*");
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getPartenaires(): Promise<Partenaire[]> {
+  const { data, error } = await supabase
+    .from("partenaires")
+    .select("*")
+    .order("ordre", { ascending: true })
+    .order("nom", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getPartenaire(slug: string): Promise<Partenaire | null> {
+  const { data, error } = await supabase
+    .from("partenaires")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
 }
 
 export function getProchainsMatchs(matchs: Match[]): Match[] {

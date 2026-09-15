@@ -22,6 +22,11 @@ const sections = [
     label: "Apparence",
     description: "Changer la photo de fond de la page d'accueil.",
   },
+  {
+    href: "/admin/partenaires",
+    label: "Partenaires",
+    description: "Gérer les logos et fiches des partenaires du club.",
+  },
 ];
 
 export default async function AdminHomePage({

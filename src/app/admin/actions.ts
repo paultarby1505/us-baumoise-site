@@ -185,14 +185,16 @@ export async function removeTeamMember(id: string) {
 
 async function uniqueSlug(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
-  base: string
+  table: string,
+  base: string,
+  fallback: string
 ) {
-  const baseSlug = slugify(base) || "actualite";
+  const baseSlug = slugify(base) || fallback;
   let candidate = baseSlug;
   let i = 2;
   for (;;) {
     const { data } = await supabase
-      .from("actualites")
+      .from(table)
       .select("id")
       .eq("slug", candidate)
       .maybeSingle();
@@ -204,7 +206,7 @@ async function uniqueSlug(
 export async function createActualite(formData: FormData) {
   const titre = str(formData, "titre");
   const supabase = await createServerSupabaseClient();
-  const slug = await uniqueSlug(supabase, titre);
+  const slug = await uniqueSlug(supabase, "actualites", titre, "actualite");
   const id = crypto.randomUUID();
 
   let imageUrl: string | undefined;
@@ -618,4 +620,72 @@ export async function removeCategorieHeaderImage(categorie: string) {
     .update({ header_image_url: null, updated_at: new Date().toISOString() })
     .eq("categorie", categorie);
   redirect(`/admin/effectif/categories/${slug}`);
+}
+
+// --- Partenaires ---
+
+export async function createPartenaire(formData: FormData) {
+  const nom = str(formData, "nom");
+  const supabase = await createServerSupabaseClient();
+  const slug = await uniqueSlug(supabase, "partenaires", nom, "partenaire");
+  const id = crypto.randomUUID();
+
+  let logoUrl: string | undefined;
+  try {
+    logoUrl = await uploadImageIfProvided(supabase, formData, "logo", "partenaires-photos", id);
+  } catch (e) {
+    redirect(
+      `/admin/partenaires/new?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi du logo"
+      )}`
+    );
+  }
+
+  const { error } = await supabase.from("partenaires").insert({
+    id,
+    nom,
+    slug,
+    logo_url: logoUrl ?? null,
+    resume: strOrNull(formData, "resume"),
+    description: strOrNull(formData, "description"),
+    site_url: strOrNull(formData, "site_url"),
+    ordre: intOrNull(formData, "ordre") ?? 0,
+  });
+  if (error) redirect(`/admin/partenaires/new?error=${encodeURIComponent(error.message)}`);
+  redirect("/admin/partenaires");
+}
+
+export async function updatePartenaire(id: string, formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+
+  let logoUrl: string | undefined;
+  try {
+    logoUrl = await uploadImageIfProvided(supabase, formData, "logo", "partenaires-photos", id);
+  } catch (e) {
+    redirect(
+      `/admin/partenaires/${id}?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi du logo"
+      )}`
+    );
+  }
+
+  const updateData: Record<string, unknown> = {
+    nom: str(formData, "nom"),
+    resume: strOrNull(formData, "resume"),
+    description: strOrNull(formData, "description"),
+    site_url: strOrNull(formData, "site_url"),
+    ordre: intOrNull(formData, "ordre") ?? 0,
+  };
+  if (logoUrl) updateData.logo_url = logoUrl;
+
+  const { error } = await supabase.from("partenaires").update(updateData).eq("id", id);
+  if (error) redirect(`/admin/partenaires/${id}?error=${encodeURIComponent(error.message)}`);
+  redirect("/admin/partenaires");
+}
+
+export async function deletePartenaire(id: string) {
+  const supabase = await createServerSupabaseClient();
+  await supabase.from("partenaires").delete().eq("id", id);
+  await removeStoredImages(supabase, "partenaires-photos", id);
+  redirect("/admin/partenaires");
 }

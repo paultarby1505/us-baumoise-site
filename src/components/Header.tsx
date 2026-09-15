@@ -46,6 +46,9 @@ export default function Header() {
           <Link href="/galerie" className="transition-colors hover:text-club-gold-light">
             Galerie
           </Link>
+          <Link href="/partenaires" className="transition-colors hover:text-club-gold-light">
+            Partenaires
+          </Link>
         </nav>
       </div>
     </header>

@@ -1,12 +1,16 @@
 import type { MetadataRoute } from "next";
-import { getActualites, getMatchs } from "@/lib/queries";
+import { getActualites, getMatchs, getPartenaires } from "@/lib/queries";
 import { siteConfig } from "@/lib/config";
 import { CATEGORIES, categorySlug } from "@/lib/rugby";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [actualites, matchs] = await Promise.all([getActualites(), getMatchs()]);
+  const [actualites, matchs, partenaires] = await Promise.all([
+    getActualites(),
+    getMatchs(),
+    getPartenaires(),
+  ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteConfig.url, changeFrequency: "daily", priority: 1 },
@@ -14,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteConfig.url}/effectif`, changeFrequency: "weekly", priority: 0.6 },
     { url: `${siteConfig.url}/matchs`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${siteConfig.url}/galerie`, changeFrequency: "weekly", priority: 0.5 },
+    { url: `${siteConfig.url}/partenaires`, changeFrequency: "monthly", priority: 0.4 },
   ];
 
   const categorieRoutes: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
@@ -35,5 +40,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.4,
   }));
 
-  return [...staticRoutes, ...categorieRoutes, ...newsRoutes, ...matchRoutes];
+  const partenaireRoutes: MetadataRoute.Sitemap = partenaires.map((partenaire) => ({
+    url: `${siteConfig.url}/partenaires/${partenaire.slug}`,
+    changeFrequency: "monthly",
+    priority: 0.3,
+  }));
+
+  return [
+    ...staticRoutes,
+    ...categorieRoutes,
+    ...newsRoutes,
+    ...matchRoutes,
+    ...partenaireRoutes,
+  ];
 }

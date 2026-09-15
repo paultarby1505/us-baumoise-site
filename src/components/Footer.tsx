@@ -14,6 +14,11 @@ export default async function Footer() {
           <div>
             <p className="font-semibold text-white">{siteConfig.name}</p>
             <p className="mt-1">{siteConfig.ville} — Doubs</p>
+            <p className="mt-1">
+              <a href="mailto:secretariat.usb@orange.fr" className="hover:text-club-gold-light">
+                Secrétariat - USB RUGBY : secretariat.usb@orange.fr
+              </a>
+            </p>
             <p className="mt-4 text-white/60">
               © {new Date().getFullYear()} {siteConfig.name}. Tous droits réservés.
             </p>

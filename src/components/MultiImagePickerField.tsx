@@ -4,6 +4,10 @@ import { useRef, useState } from "react";
 import { compressImage } from "@/lib/image-compress";
 import ImageCropperModal from "@/components/ImageCropperModal";
 
+function extForMimeType(type: string): string {
+  return type === "image/png" ? "png" : "jpg";
+}
+
 type Item = { key: string; file: File; previewUrl: string };
 
 export default function MultiImagePickerField({
@@ -66,7 +70,8 @@ export default function MultiImagePickerField({
     if (!target) return;
 
     const base = target.file.name.replace(/\.[^.]+$/, "") || "photo";
-    const cropped = new File([blob], `${base}.jpg`, { type: blob.type || "image/jpeg" });
+    const type = blob.type || target.file.type || "image/jpeg";
+    const cropped = new File([blob], `${base}.${extForMimeType(type)}`, { type });
     const compressed = await compressImage(cropped);
     const next = items.map((item) =>
       item.key === key
@@ -140,6 +145,7 @@ export default function MultiImagePickerField({
         <ImageCropperModal
           src={cropTarget.previewUrl}
           aspect={aspect}
+          mimeType={cropTarget.file.type}
           onCancel={() => setCropKey(null)}
           onConfirm={(blob) => applyCrop(cropTarget.key, blob)}
         />

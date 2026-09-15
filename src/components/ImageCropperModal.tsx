@@ -15,11 +15,13 @@ function initialCrop(width: number, height: number, aspect?: number): Crop {
 export default function ImageCropperModal({
   src,
   aspect,
+  mimeType,
   onCancel,
   onConfirm,
 }: {
   src: string;
   aspect?: number;
+  mimeType?: string;
   onCancel: () => void;
   onConfirm: (blob: Blob) => void;
 }) {
@@ -41,7 +43,7 @@ export default function ImageCropperModal({
     }
     setBusy(true);
     try {
-      const blob = await getCroppedBlob(image, completedCrop);
+      const blob = await getCroppedBlob(image, completedCrop, mimeType || "image/jpeg");
       onConfirm(blob);
     } catch {
       onCancel();

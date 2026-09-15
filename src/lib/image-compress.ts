@@ -6,6 +6,10 @@ export async function compressImage(file: File): Promise<File> {
     return file;
   }
 
+  // Les PNG (et WebP) peuvent avoir un fond transparent (ex: logo d'un club
+  // adverse) : les convertir en JPEG remplirait la transparence en noir.
+  const preserveTransparency = file.type === "image/png" || file.type === "image/webp";
+
   try {
     const bitmap = await createImageBitmap(file);
     const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
@@ -19,13 +23,15 @@ export async function compressImage(file: File): Promise<File> {
     if (!ctx) return file;
     ctx.drawImage(bitmap, 0, 0, width, height);
 
+    const outputType = preserveTransparency ? "image/png" : "image/jpeg";
     const blob: Blob | null = await new Promise((resolve) =>
-      canvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY)
+      canvas.toBlob(resolve, outputType, preserveTransparency ? undefined : JPEG_QUALITY)
     );
     if (!blob || blob.size >= file.size) return file;
 
-    const newName = file.name.replace(/\.[^.]+$/, "") + ".jpg";
-    return new File([blob], newName, { type: "image/jpeg" });
+    const ext = preserveTransparency ? "png" : "jpg";
+    const newName = file.name.replace(/\.[^.]+$/, "") + "." + ext;
+    return new File([blob], newName, { type: outputType });
   } catch {
     // Format non décodable par le navigateur (ex: certains HEIC) : on garde le fichier original.
     return file;

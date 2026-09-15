@@ -4,6 +4,10 @@ import { useRef, useState } from "react";
 import { compressImage } from "@/lib/image-compress";
 import ImageCropperModal from "@/components/ImageCropperModal";
 
+function extForMimeType(type: string): string {
+  return type === "image/png" ? "png" : "jpg";
+}
+
 export default function ImagePickerField({
   name,
   label,
@@ -21,25 +25,29 @@ export default function ImagePickerField({
   const [status, setStatus] = useState<"idle" | "compressing" | "error">("idle");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
-  const pendingFileName = useRef<string>("photo.jpg");
+  const [cropType, setCropType] = useState<string | undefined>(undefined);
+  const pendingFile = useRef<File | null>(null);
 
   function handlePick() {
     const input = inputRef.current;
     const file = input?.files?.[0];
     if (!input || !file) return;
-    pendingFileName.current = file.name;
+    pendingFile.current = file;
+    setCropType(file.type);
     setCropSrc(URL.createObjectURL(file));
   }
 
   async function applyCroppedFile(blob: Blob) {
     const input = inputRef.current;
+    const original = pendingFile.current;
     setCropSrc(null);
     if (!input) return;
 
     setStatus("compressing");
     try {
-      const base = pendingFileName.current.replace(/\.[^.]+$/, "") || "photo";
-      const cropped = new File([blob], `${base}.jpg`, { type: blob.type || "image/jpeg" });
+      const base = (original?.name ?? "photo").replace(/\.[^.]+$/, "") || "photo";
+      const type = blob.type || original?.type || "image/jpeg";
+      const cropped = new File([blob], `${base}.${extForMimeType(type)}`, { type });
       const compressed = await compressImage(cropped);
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(compressed);
@@ -58,7 +66,11 @@ export default function ImagePickerField({
 
   function reopenCrop() {
     const file = inputRef.current?.files?.[0];
-    if (file) setCropSrc(URL.createObjectURL(file));
+    if (file) {
+      pendingFile.current = file;
+      setCropType(file.type);
+      setCropSrc(URL.createObjectURL(file));
+    }
   }
 
   return (
@@ -105,6 +117,7 @@ export default function ImagePickerField({
         <ImageCropperModal
           src={cropSrc}
           aspect={aspect}
+          mimeType={cropType}
           onCancel={cancelCrop}
           onConfirm={applyCroppedFile}
         />

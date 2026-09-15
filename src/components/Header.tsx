@@ -79,17 +79,26 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Menu desktop — inchangé */}
-        <nav className="hidden items-center gap-5 text-sm font-medium uppercase tracking-wide md:flex">
-          <Link href="/" className="transition-colors hover:text-club-gold-light">
+        {/* Menu desktop */}
+        <nav className="hidden items-center gap-1 text-sm font-medium uppercase tracking-wide md:flex">
+          <Link
+            href="/"
+            className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
+          >
             Accueil
           </Link>
-          <Link href="/actualites" className="transition-colors hover:text-club-gold-light">
+          <Link
+            href="/actualites"
+            className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
+          >
             Actualités
           </Link>
 
           <div className="group relative">
-            <Link href="/effectif" className="transition-colors hover:text-club-gold-light">
+            <Link
+              href="/effectif"
+              className="block rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
+            >
               Catégorie
             </Link>
             <div className="invisible absolute left-1/2 top-full z-10 w-44 -translate-x-1/2 pt-3 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
@@ -107,16 +116,28 @@ export default function Header() {
             </div>
           </div>
 
-          <Link href="/matchs" className="transition-colors hover:text-club-gold-light">
+          <Link
+            href="/matchs"
+            className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
+          >
             Matchs
           </Link>
-          <Link href="/classements" className="transition-colors hover:text-club-gold-light">
+          <Link
+            href="/classements"
+            className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
+          >
             Classements
           </Link>
-          <Link href="/partenaires" className="transition-colors hover:text-club-gold-light">
+          <Link
+            href="/partenaires"
+            className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
+          >
             Partenaires
           </Link>
-          <Link href="/galerie" className="transition-colors hover:text-club-gold-light">
+          <Link
+            href="/galerie"
+            className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
+          >
             Galerie
           </Link>
         </nav>

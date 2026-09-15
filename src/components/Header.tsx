@@ -9,10 +9,10 @@ import { CATEGORIES, categorySlug } from "@/lib/rugby";
 const NAV_LINKS = [
   { href: "/", label: "Accueil" },
   { href: "/actualites", label: "Actualités" },
-  { href: "/effectif", label: "Effectif" },
+  { href: "/effectif", label: "Catégorie" },
   { href: "/matchs", label: "Matchs" },
-  { href: "/galerie", label: "Galerie" },
   { href: "/partenaires", label: "Partenaires" },
+  { href: "/galerie", label: "Galerie" },
 ];
 
 function BurgerIcon() {
@@ -71,7 +71,7 @@ export default function Header() {
 
           <div className="group relative">
             <Link href="/effectif" className="transition-colors hover:text-club-gold-light">
-              Effectif
+              Catégorie
             </Link>
             <div className="invisible absolute left-1/2 top-full z-10 w-44 -translate-x-1/2 pt-3 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
               <div className="overflow-hidden rounded-md border border-white/10 bg-club-black-soft py-2 shadow-lg">
@@ -91,11 +91,11 @@ export default function Header() {
           <Link href="/matchs" className="transition-colors hover:text-club-gold-light">
             Matchs
           </Link>
-          <Link href="/galerie" className="transition-colors hover:text-club-gold-light">
-            Galerie
-          </Link>
           <Link href="/partenaires" className="transition-colors hover:text-club-gold-light">
             Partenaires
+          </Link>
+          <Link href="/galerie" className="transition-colors hover:text-club-gold-light">
+            Galerie
           </Link>
         </nav>
 
@@ -125,7 +125,7 @@ export default function Header() {
             </Link>
           ))}
           <p className="mt-3 text-xs font-semibold normal-case tracking-normal text-white/40">
-            Effectif par catégorie
+            Catégorie
           </p>
           <div className="mt-2 grid grid-cols-3 gap-x-3 gap-y-2 pb-2">
             {CATEGORIES.map((cat) => (

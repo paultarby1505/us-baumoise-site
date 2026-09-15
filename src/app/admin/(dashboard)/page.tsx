@@ -18,6 +18,11 @@ const sections = [
     description: "Gérer le calendrier et les résultats.",
   },
   {
+    href: "/admin/classements",
+    label: "Classements",
+    description: "Mettre à jour le classement des équipes par catégorie.",
+  },
+  {
     href: "/admin/apparence",
     label: "Apparence",
     description: "Changer la photo de fond de la page d'accueil.",
@@ -26,6 +31,11 @@ const sections = [
     href: "/admin/partenaires",
     label: "Partenaires",
     description: "Gérer les logos et fiches des partenaires du club.",
+  },
+  {
+    href: "/admin/contacts",
+    label: "Messages",
+    description: "Consulter les messages envoyés via le formulaire de contact.",
   },
 ];
 

@@ -5,23 +5,8 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createEphemeralSupabaseClient } from "@/lib/supabase-ephemeral";
 import { getCurrentProfile } from "@/lib/auth";
 import { slugify } from "@/lib/slugify";
-import { CATEGORIES, categorySlug } from "@/lib/rugby";
-
-function str(formData: FormData, key: string): string {
-  return String(formData.get(key) ?? "").trim();
-}
-
-function strOrNull(formData: FormData, key: string): string | null {
-  const value = str(formData, key);
-  return value === "" ? null : value;
-}
-
-function intOrNull(formData: FormData, key: string): number | null {
-  const value = str(formData, key);
-  if (value === "") return null;
-  const n = Number.parseInt(value, 10);
-  return Number.isNaN(n) ? null : n;
-}
+import { CATEGORIES, MATCH_CATEGORIES, categorySlug } from "@/lib/rugby";
+import { str, strOrNull, intOrNull } from "@/lib/form-data";
 
 async function uploadImageIfProvided(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
@@ -688,4 +673,62 @@ export async function deletePartenaire(id: string) {
   await supabase.from("partenaires").delete().eq("id", id);
   await removeStoredImages(supabase, "partenaires-photos", id);
   redirect("/admin/partenaires");
+}
+
+// --- Classements ---
+
+function classementData(formData: FormData) {
+  const categorie = str(formData, "categorie");
+  return {
+    categorie: MATCH_CATEGORIES.includes(categorie as (typeof MATCH_CATEGORIES)[number])
+      ? categorie
+      : MATCH_CATEGORIES[0],
+    ordre: intOrNull(formData, "ordre") ?? 0,
+    equipe: str(formData, "equipe"),
+    notre_club: formData.get("notre_club") === "on",
+    joues: intOrNull(formData, "joues") ?? 0,
+    gagnes: intOrNull(formData, "gagnes") ?? 0,
+    nuls: intOrNull(formData, "nuls") ?? 0,
+    perdus: intOrNull(formData, "perdus") ?? 0,
+    points_marques: intOrNull(formData, "points_marques") ?? 0,
+    points_encaisses: intOrNull(formData, "points_encaisses") ?? 0,
+    points_classement: intOrNull(formData, "points_classement") ?? 0,
+  };
+}
+
+export async function createClassement(formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.from("classements").insert(classementData(formData));
+  if (error) redirect(`/admin/classements/new?error=${encodeURIComponent(error.message)}`);
+  redirect("/admin/classements");
+}
+
+export async function updateClassement(id: string, formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase
+    .from("classements")
+    .update(classementData(formData))
+    .eq("id", id);
+  if (error) redirect(`/admin/classements/${id}?error=${encodeURIComponent(error.message)}`);
+  redirect("/admin/classements");
+}
+
+export async function deleteClassement(id: string) {
+  const supabase = await createServerSupabaseClient();
+  await supabase.from("classements").delete().eq("id", id);
+  redirect("/admin/classements");
+}
+
+// --- Contacts (messages reçus) ---
+
+export async function markContactLu(id: string, lu: boolean) {
+  const supabase = await createServerSupabaseClient();
+  await supabase.from("contacts").update({ lu }).eq("id", id);
+  redirect("/admin/contacts");
+}
+
+export async function deleteContact(id: string) {
+  const supabase = await createServerSupabaseClient();
+  await supabase.from("contacts").delete().eq("id", id);
+  redirect("/admin/contacts");
 }

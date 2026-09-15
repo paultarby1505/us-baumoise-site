@@ -72,3 +72,31 @@ export type Partenaire = {
   ordre: number;
   created_at: string;
 };
+
+export type Contact = {
+  id: string;
+  nom: string;
+  prenom: string;
+  email: string | null;
+  telephone: string | null;
+  objet: string;
+  message: string;
+  lu: boolean;
+  created_at: string;
+};
+
+export type ClassementLigne = {
+  id: string;
+  categorie: string;
+  ordre: number;
+  equipe: string;
+  notre_club: boolean;
+  joues: number;
+  gagnes: number;
+  nuls: number;
+  perdus: number;
+  points_marques: number;
+  points_encaisses: number;
+  points_classement: number;
+  created_at: string;
+};

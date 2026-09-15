@@ -3,6 +3,7 @@ import type {
   Actualite,
   ActualitePhoto,
   CategoriePage,
+  ClassementLigne,
   GalleryPhoto,
   Joueur,
   Match,
@@ -133,6 +134,26 @@ export async function getPartenaire(slug: string): Promise<Partenaire | null> {
     .maybeSingle();
   if (error) throw error;
   return data;
+}
+
+export async function getClassements(): Promise<ClassementLigne[]> {
+  const { data, error } = await supabase
+    .from("classements")
+    .select("*")
+    .order("categorie", { ascending: true })
+    .order("ordre", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getClassement(categorie: string): Promise<ClassementLigne[]> {
+  const { data, error } = await supabase
+    .from("classements")
+    .select("*")
+    .eq("categorie", categorie)
+    .order("ordre", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
 }
 
 export function getProchainsMatchs(matchs: Match[]): Match[] {

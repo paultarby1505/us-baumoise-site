@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/actualites", label: "Actualités" },
   { href: "/effectif", label: "Catégorie" },
   { href: "/matchs", label: "Matchs" },
+  { href: "/classements", label: "Classements" },
   { href: "/partenaires", label: "Partenaires" },
   { href: "/galerie", label: "Galerie" },
 ];
@@ -43,6 +44,24 @@ function CloseIcon() {
       aria-hidden="true"
     >
       <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+function EnvelopeIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
     </svg>
   );
 }
@@ -91,6 +110,9 @@ export default function Header() {
           <Link href="/matchs" className="transition-colors hover:text-club-gold-light">
             Matchs
           </Link>
+          <Link href="/classements" className="transition-colors hover:text-club-gold-light">
+            Classements
+          </Link>
           <Link href="/partenaires" className="transition-colors hover:text-club-gold-light">
             Partenaires
           </Link>
@@ -99,16 +121,26 @@ export default function Header() {
           </Link>
         </nav>
 
-        {/* Bouton menu mobile */}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-expanded={open}
-          className="flex h-9 w-9 items-center justify-center rounded text-white hover:text-club-gold-light md:hidden"
-        >
-          {open ? <CloseIcon /> : <BurgerIcon />}
-        </button>
+        <div className="flex items-center gap-1">
+          <Link
+            href="/contact"
+            aria-label="Nous contacter"
+            className="flex h-9 w-9 items-center justify-center rounded text-white hover:text-club-gold-light"
+          >
+            <EnvelopeIcon />
+          </Link>
+
+          {/* Bouton menu mobile */}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={open}
+            className="flex h-9 w-9 items-center justify-center rounded text-white hover:text-club-gold-light md:hidden"
+          >
+            {open ? <CloseIcon /> : <BurgerIcon />}
+          </button>
+        </div>
       </div>
 
       {/* Menu mobile */}

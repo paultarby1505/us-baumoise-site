@@ -58,11 +58,17 @@ export default async function AdminDashboardLayout({
           <Link href="/admin/matchs" className="hover:text-club-gold-light">
             Matchs
           </Link>
+          <Link href="/admin/classements" className="hover:text-club-gold-light">
+            Classements
+          </Link>
           <Link href="/admin/apparence" className="hover:text-club-gold-light">
             Apparence
           </Link>
           <Link href="/admin/partenaires" className="hover:text-club-gold-light">
             Partenaires
+          </Link>
+          <Link href="/admin/contacts" className="hover:text-club-gold-light">
+            Messages
           </Link>
           {profile.role === "owner" && (
             <Link href="/admin/equipe" className="hover:text-club-gold-light">

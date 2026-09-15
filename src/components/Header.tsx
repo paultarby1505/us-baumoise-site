@@ -71,10 +71,21 @@ export default function Header() {
 
   return (
     <header className="bg-club-black text-white border-b-2 border-club-gold">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <Image src="/logo.png" alt="" width={70} height={44} className="h-11 w-auto" priority />
-          <span className="text-lg font-bold tracking-wide">
+      <div className="flex items-center justify-between px-4 py-3">
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-3"
+          onClick={() => setOpen(false)}
+        >
+          <Image
+            src="/logo.png"
+            alt=""
+            width={70}
+            height={44}
+            className="h-11 w-auto shrink-0"
+            priority
+          />
+          <span className="whitespace-nowrap text-lg font-bold tracking-wide">
             {siteConfig.shortName}
           </span>
         </Link>

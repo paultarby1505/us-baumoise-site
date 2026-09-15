@@ -7,7 +7,6 @@ import { siteConfig } from "@/lib/config";
 import { CATEGORIES, categorySlug } from "@/lib/rugby";
 
 const NAV_LINKS = [
-  { href: "/", label: "Accueil" },
   { href: "/actualites", label: "Actualités" },
   { href: "/effectif", label: "Catégorie" },
   { href: "/matchs", label: "Matchs" },
@@ -92,12 +91,6 @@ export default function Header() {
 
         {/* Menu desktop */}
         <nav className="hidden items-center gap-1 text-sm font-medium uppercase tracking-wide md:flex">
-          <Link
-            href="/"
-            className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
-          >
-            Accueil
-          </Link>
           <Link
             href="/actualites"
             className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"

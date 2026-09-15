@@ -70,7 +70,7 @@ export default function Header() {
 
   return (
     <header className="bg-club-black text-white border-b-2 border-club-gold">
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center px-4 py-3">
+      <div className="flex items-center justify-between px-4 py-3 md:grid md:grid-cols-[1fr_auto_1fr]">
         <Link
           href="/"
           className="flex shrink-0 items-center justify-self-start gap-3"

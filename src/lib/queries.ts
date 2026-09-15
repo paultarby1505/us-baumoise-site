@@ -136,24 +136,34 @@ export async function getPartenaire(slug: string): Promise<Partenaire | null> {
   return data;
 }
 
+// Classement calculé automatiquement : points puis différence puis points
+// marqués, comme au rugby. Pas de tri manuel à maintenir.
+function compareClassement(a: ClassementLigne, b: ClassementLigne): number {
+  if (a.points_classement !== b.points_classement) {
+    return b.points_classement - a.points_classement;
+  }
+  const diffA = a.points_marques - a.points_encaisses;
+  const diffB = b.points_marques - b.points_encaisses;
+  if (diffA !== diffB) return diffB - diffA;
+  if (a.points_marques !== b.points_marques) return b.points_marques - a.points_marques;
+  return a.equipe.localeCompare(b.equipe);
+}
+
 export async function getClassements(): Promise<ClassementLigne[]> {
-  const { data, error } = await supabase
-    .from("classements")
-    .select("*")
-    .order("categorie", { ascending: true })
-    .order("ordre", { ascending: true });
+  const { data, error } = await supabase.from("classements").select("*");
   if (error) throw error;
-  return data ?? [];
+  return (data ?? [])
+    .sort(compareClassement)
+    .sort((a, b) => a.categorie.localeCompare(b.categorie));
 }
 
 export async function getClassement(categorie: string): Promise<ClassementLigne[]> {
   const { data, error } = await supabase
     .from("classements")
     .select("*")
-    .eq("categorie", categorie)
-    .order("ordre", { ascending: true });
+    .eq("categorie", categorie);
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).sort(compareClassement);
 }
 
 export function getProchainsMatchs(matchs: Match[]): Match[] {

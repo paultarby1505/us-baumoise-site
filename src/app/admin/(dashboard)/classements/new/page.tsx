@@ -1,4 +1,5 @@
 import { createClassement } from "@/app/admin/actions";
+import ImagePickerField from "@/components/ImagePickerField";
 import { MATCH_CATEGORIES } from "@/lib/rugby";
 
 export default async function NewClassementPage({
@@ -42,15 +43,11 @@ export default async function NewClassementPage({
           <input type="checkbox" name="notre_club" />
           C&apos;est notre club
         </label>
-        <label className="block text-sm font-medium">
-          Ordre d&apos;affichage (position dans le classement)
-          <input
-            type="number"
-            name="ordre"
-            defaultValue={0}
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
+        <ImagePickerField name="logo" label="Logo (optionnel)" aspect={1} />
+        <p className="text-xs text-foreground/50">
+          Pas besoin de définir un ordre : le classement se trie automatiquement (points, puis
+          différence, puis points marqués) à chaque enregistrement.
+        </p>
         <div className="grid grid-cols-4 gap-4">
           <label className="block text-sm font-medium">
             J

@@ -683,7 +683,6 @@ function classementData(formData: FormData) {
     categorie: MATCH_CATEGORIES.includes(categorie as (typeof MATCH_CATEGORIES)[number])
       ? categorie
       : MATCH_CATEGORIES[0],
-    ordre: intOrNull(formData, "ordre") ?? 0,
     equipe: str(formData, "equipe"),
     notre_club: formData.get("notre_club") === "on",
     joues: intOrNull(formData, "joues") ?? 0,
@@ -698,17 +697,44 @@ function classementData(formData: FormData) {
 
 export async function createClassement(formData: FormData) {
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.from("classements").insert(classementData(formData));
+  const id = crypto.randomUUID();
+
+  let logoUrl: string | undefined;
+  try {
+    logoUrl = await uploadImageIfProvided(supabase, formData, "logo", "classements-logos", id);
+  } catch (e) {
+    redirect(
+      `/admin/classements/new?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi du logo"
+      )}`
+    );
+  }
+
+  const { error } = await supabase
+    .from("classements")
+    .insert({ id, ...classementData(formData), logo_url: logoUrl ?? null });
   if (error) redirect(`/admin/classements/new?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/classements");
 }
 
 export async function updateClassement(id: string, formData: FormData) {
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase
-    .from("classements")
-    .update(classementData(formData))
-    .eq("id", id);
+
+  let logoUrl: string | undefined;
+  try {
+    logoUrl = await uploadImageIfProvided(supabase, formData, "logo", "classements-logos", id);
+  } catch (e) {
+    redirect(
+      `/admin/classements/${id}?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi du logo"
+      )}`
+    );
+  }
+
+  const updateData: Record<string, unknown> = classementData(formData);
+  if (logoUrl) updateData.logo_url = logoUrl;
+
+  const { error } = await supabase.from("classements").update(updateData).eq("id", id);
   if (error) redirect(`/admin/classements/${id}?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/classements");
 }
@@ -716,6 +742,7 @@ export async function updateClassement(id: string, formData: FormData) {
 export async function deleteClassement(id: string) {
   const supabase = await createServerSupabaseClient();
   await supabase.from("classements").delete().eq("id", id);
+  await removeStoredImages(supabase, "classements-logos", id);
   redirect("/admin/classements");
 }
 

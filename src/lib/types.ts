@@ -88,8 +88,8 @@ export type Contact = {
 export type ClassementLigne = {
   id: string;
   categorie: string;
-  ordre: number;
   equipe: string;
+  logo_url: string | null;
   notre_club: boolean;
   joues: number;
   gagnes: number;

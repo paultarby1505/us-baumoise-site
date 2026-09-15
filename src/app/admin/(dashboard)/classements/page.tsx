@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getClassements } from "@/lib/queries";
 import { deleteClassement } from "@/app/admin/actions";
@@ -29,22 +30,42 @@ export default async function AdminClassementsPage() {
         return (
           <div key={cat} className="mt-8">
             <h2 className="text-lg font-bold text-club-gold">{cat}</h2>
+            <p className="mt-1 text-xs text-foreground/50">
+              Ordre calculé automatiquement (points, différence, points marqués) — modifie les
+              lignes après chaque week-end, le classement se remet à jour tout seul.
+            </p>
             <div className="mt-3 divide-y divide-black/10 rounded-lg border border-black/10 bg-white">
-              {rows.map((ligne) => (
+              {rows.map((ligne, i) => (
                 <div key={ligne.id} className="flex items-center justify-between gap-4 p-4">
-                  <div>
-                    <p className="font-semibold">
-                      {ligne.equipe}
-                      {ligne.notre_club && (
-                        <span className="ml-2 text-xs font-semibold text-club-gold">
-                          (notre club)
-                        </span>
+                  <div className="flex items-center gap-3">
+                    <span className="w-5 shrink-0 text-sm font-semibold text-foreground/40">
+                      {i + 1}
+                    </span>
+                    <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded border border-black/10 bg-white">
+                      {ligne.logo_url && (
+                        <Image
+                          src={ligne.logo_url}
+                          alt=""
+                          fill
+                          className="object-contain p-1"
+                          sizes="36px"
+                        />
                       )}
-                    </p>
-                    <p className="text-xs text-foreground/50">
-                      {ligne.joues} J · {ligne.gagnes} G · {ligne.nuls} N · {ligne.perdus} P ·{" "}
-                      {ligne.points_classement} pts
-                    </p>
+                    </div>
+                    <div>
+                      <p className="font-semibold">
+                        {ligne.equipe}
+                        {ligne.notre_club && (
+                          <span className="ml-2 text-xs font-semibold text-club-gold">
+                            (notre club)
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-foreground/50">
+                        {ligne.joues} J · {ligne.gagnes} G · {ligne.nuls} N · {ligne.perdus} P ·{" "}
+                        {ligne.points_classement} pts
+                      </p>
+                    </div>
                   </div>
                   <div className="flex shrink-0 gap-3 text-sm">
                     <Link

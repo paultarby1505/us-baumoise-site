@@ -1,7 +1,9 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { updateClassement, deleteClassement } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import ImagePickerField from "@/components/ImagePickerField";
 import { MATCH_CATEGORIES } from "@/lib/rugby";
 
 export default async function EditClassementPage({
@@ -28,6 +30,13 @@ export default async function EditClassementPage({
       {error && (
         <p className="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}
+
+      {ligne.logo_url && (
+        <div className="relative mt-4 h-20 w-20 overflow-hidden rounded border border-black/10 bg-white">
+          <Image src={ligne.logo_url} alt="" fill className="object-contain p-1" sizes="80px" />
+        </div>
+      )}
+
       <form action={updateClassement.bind(null, id)} className="mt-6 max-w-md space-y-4">
         <label className="block text-sm font-medium">
           Catégorie
@@ -58,15 +67,15 @@ export default async function EditClassementPage({
           <input type="checkbox" name="notre_club" defaultChecked={ligne.notre_club} />
           C&apos;est notre club
         </label>
-        <label className="block text-sm font-medium">
-          Ordre d&apos;affichage (position dans le classement)
-          <input
-            type="number"
-            name="ordre"
-            defaultValue={ligne.ordre}
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
+        <ImagePickerField
+          name="logo"
+          label={ligne.logo_url ? "Remplacer le logo" : "Logo (optionnel)"}
+          aspect={1}
+        />
+        <p className="text-xs text-foreground/50">
+          Pas besoin de définir un ordre : le classement se trie automatiquement (points, puis
+          différence, puis points marqués) à chaque enregistrement.
+        </p>
         <div className="grid grid-cols-4 gap-4">
           <label className="block text-sm font-medium">
             J

@@ -25,7 +25,7 @@ export default function MatchCard({ match }: { match: Match }) {
       href={`/matchs/${match.id}`}
       className="block rounded-lg border border-black/10 p-5 transition-shadow hover:shadow-md"
     >
-      <div className="flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide text-club-gold">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs font-semibold uppercase tracking-wide text-club-gold">
         <span>
           {match.categorie}
           {match.competition ? ` · ${match.competition}` : ""}
@@ -36,7 +36,7 @@ export default function MatchCard({ match }: { match: Match }) {
         </span>
       </div>
       <p className="mt-1 text-xs text-foreground/50">{formatDate(match.date_match)}</p>
-      <div className="mt-2 flex items-center justify-between gap-3">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <span className="flex items-center gap-2 font-semibold">
           {!match.domicile && adversaireLogo && (
             <Image
@@ -44,7 +44,7 @@ export default function MatchCard({ match }: { match: Match }) {
               alt=""
               width={24}
               height={24}
-              className="h-6 w-6 rounded-full object-cover"
+              className="h-6 w-6 shrink-0 rounded-full object-cover"
             />
           )}
           {domicileLabel}
@@ -65,7 +65,7 @@ export default function MatchCard({ match }: { match: Match }) {
               alt=""
               width={24}
               height={24}
-              className="h-6 w-6 rounded-full object-cover"
+              className="h-6 w-6 shrink-0 rounded-full object-cover"
             />
           )}
         </span>

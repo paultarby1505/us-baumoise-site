@@ -103,7 +103,7 @@ export default async function MatchDetailPage({
 
         <p className="mt-1 text-sm text-foreground/60">{formatDate(match.date_match)}</p>
 
-        <div className="mt-6 grid grid-cols-3 items-center gap-4 text-center">
+        <div className="mt-6 grid grid-cols-3 items-center gap-2 text-center sm:gap-4">
           <div className="flex flex-col items-center gap-2">
             {domicileLogo && (
               <Image
@@ -111,14 +111,14 @@ export default async function MatchDetailPage({
                 alt=""
                 width={64}
                 height={64}
-                className="h-16 w-16 object-contain"
+                className="h-12 w-12 object-contain sm:h-16 sm:w-16"
               />
             )}
             <span className="font-semibold">{domicileNom}</span>
           </div>
           <div>
             {joue ? (
-              <span className="text-2xl font-extrabold text-club-gold">
+              <span className="text-xl font-extrabold text-club-gold sm:text-2xl">
                 {match.domicile ? match.score_us : match.score_adverse} -{" "}
                 {match.domicile ? match.score_adverse : match.score_us}
               </span>
@@ -133,7 +133,7 @@ export default async function MatchDetailPage({
                 alt=""
                 width={64}
                 height={64}
-                className="h-16 w-16 object-contain"
+                className="h-12 w-12 object-contain sm:h-16 sm:w-16"
               />
             )}
             <span className="font-semibold">{exterieurNom}</span>

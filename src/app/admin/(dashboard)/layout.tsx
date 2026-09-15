@@ -45,7 +45,7 @@ export default async function AdminDashboardLayout({
             </button>
           </form>
         </div>
-        <nav className="mx-auto flex max-w-5xl gap-5 px-4 pb-3 text-sm">
+        <nav className="mx-auto flex max-w-5xl items-center gap-5 overflow-x-auto whitespace-nowrap px-4 pb-3 text-sm">
           <Link href="/admin" className="hover:text-club-gold-light">
             Accueil
           </Link>
@@ -69,7 +69,7 @@ export default async function AdminDashboardLayout({
               Équipe
             </Link>
           )}
-          <Link href="/" className="ml-auto hover:text-club-gold-light">
+          <Link href="/" className="shrink-0 hover:text-club-gold-light sm:ml-auto">
             Voir le site →
           </Link>
         </nav>

@@ -2,11 +2,11 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getJoueurs, getMatchComposition } from "@/lib/queries";
-import { updateMatch, deleteMatch, updateMatchComposition } from "@/app/admin/actions";
+import { updateMatch, deleteMatch } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import ImagePickerField from "@/components/ImagePickerField";
-import { CATEGORIES } from "@/lib/rugby";
-import type { Joueur } from "@/lib/types";
+import CompositionBuilder from "@/components/CompositionBuilder";
+import { CATEGORIES, categoryRank } from "@/lib/rugby";
 
 function toDatetimeLocal(iso: string): string {
   const date = new Date(iso);
@@ -14,18 +14,6 @@ function toDatetimeLocal(iso: string): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
     date.getHours()
   )}:${pad(date.getMinutes())}`;
-}
-
-function groupByCategorie(joueurs: Joueur[]) {
-  const groupes = new Map<string, Joueur[]>();
-  for (const joueur of joueurs) {
-    const liste = groupes.get(joueur.categorie) ?? [];
-    liste.push(joueur);
-    groupes.set(joueur.categorie, liste);
-  }
-  return CATEGORIES.map((cat) => [cat, groupes.get(cat) ?? []] as const).filter(
-    ([, membres]) => membres.length > 0
-  );
 }
 
 export default async function EditMatchPage({
@@ -46,13 +34,23 @@ export default async function EditMatchPage({
 
   if (!match) notFound();
 
-  const [joueurs, composition] = await Promise.all([getJoueurs(), getMatchComposition(id)]);
-  const selectedIds = new Set(composition.map((j) => j.id));
-  const groupes = groupByCategorie(joueurs);
+  const [allJoueurs, composition] = await Promise.all([getJoueurs(), getMatchComposition(id)]);
+  const joueurs = [...allJoueurs].sort((a, b) => {
+    const memeCategorie =
+      (a.categorie === match.categorie ? 0 : 1) - (b.categorie === match.categorie ? 0 : 1);
+    if (memeCategorie !== 0) return memeCategorie;
+    return categoryRank(a.categorie) - categoryRank(b.categorie);
+  });
+  const initialComposition = composition.map((c) => ({ slot: c.slot, joueur_id: c.joueur.id }));
 
   return (
     <div>
-      <h1 className="text-2xl font-extrabold">Modifier le match</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-extrabold">Modifier le match</h1>
+        <a href="#composition" className="text-sm text-club-gold hover:underline">
+          Aller à la composition →
+        </a>
+      </div>
       {error && (
         <p className="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}
@@ -168,45 +166,21 @@ export default async function EditMatchPage({
         </button>
       </form>
 
-      <div className="mt-10 max-w-md">
+      <div id="composition" className="mt-10 scroll-mt-6">
         <h2 className="text-lg font-bold">Composition</h2>
         <p className="mt-1 text-xs text-foreground/50">
-          Coche les joueurs qui composent l&apos;équipe pour ce match. Tant qu&apos;aucun
-          joueur n&apos;est coché, le site public affiche « Composition à venir ».
+          Tant qu&apos;aucun joueur n&apos;est placé, le site public affiche « Composition à
+          venir ».
         </p>
-        <form action={updateMatchComposition.bind(null, id)} className="mt-4 space-y-6">
-          {groupes.map(([categorie, membres]) => (
-            <fieldset key={categorie}>
-              <legend className="text-sm font-bold text-club-gold">{categorie}</legend>
-              <div className="mt-2 space-y-1">
-                {membres.map((joueur) => (
-                  <label key={joueur.id} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      name="joueurs"
-                      value={joueur.id}
-                      defaultChecked={selectedIds.has(joueur.id)}
-                    />
-                    {joueur.numero ? `#${joueur.numero} — ` : ""}
-                    {joueur.prenom} {joueur.nom}
-                    {joueur.poste ? ` (${joueur.poste})` : ""}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          ))}
-          {groupes.length === 0 && (
-            <p className="text-sm text-foreground/60">
-              Aucun joueur dans l&apos;effectif pour composer une équipe.
-            </p>
-          )}
-          <button
-            type="submit"
-            className="rounded bg-club-gold px-4 py-2 font-semibold text-black hover:bg-club-gold-light"
-          >
-            Enregistrer la composition
-          </button>
-        </form>
+        {joueurs.length > 0 ? (
+          <div className="mt-4">
+            <CompositionBuilder matchId={id} joueurs={joueurs} initial={initialComposition} />
+          </div>
+        ) : (
+          <p className="mt-4 text-sm text-foreground/60">
+            Aucun joueur dans l&apos;effectif pour composer une équipe.
+          </p>
+        )}
       </div>
 
       <form action={deleteMatch.bind(null, id)} className="mt-8 max-w-md">

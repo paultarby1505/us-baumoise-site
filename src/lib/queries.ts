@@ -1,5 +1,4 @@
 import { supabase } from "./supabase";
-import { posteRank } from "./rugby";
 import type {
   Actualite,
   ActualitePhoto,
@@ -57,17 +56,17 @@ export async function getMatch(id: string): Promise<Match | null> {
   return data;
 }
 
-export async function getMatchComposition(matchId: string): Promise<Joueur[]> {
+export type CompositionSlot = { slot: number; joueur: Joueur };
+
+export async function getMatchComposition(matchId: string): Promise<CompositionSlot[]> {
   const { data, error } = await supabase
     .from("match_compositions")
-    .select("joueur:joueurs(*)")
-    .eq("match_id", matchId);
+    .select("slot, joueur:joueurs(*)")
+    .eq("match_id", matchId)
+    .order("slot", { ascending: true });
   if (error) throw error;
-  const rows = (data ?? []) as unknown as { joueur: Joueur | null }[];
-  const joueurs = rows.map((row) => row.joueur).filter((j): j is Joueur => j !== null);
-  return joueurs.sort(
-    (a, b) => posteRank(a.poste) - posteRank(b.poste) || (a.numero ?? 999) - (b.numero ?? 999)
-  );
+  const rows = (data ?? []) as unknown as { slot: number; joueur: Joueur | null }[];
+  return rows.filter((r): r is CompositionSlot => r.joueur !== null);
 }
 
 export async function getActualitePhotos(actualiteId: string): Promise<ActualitePhoto[]> {

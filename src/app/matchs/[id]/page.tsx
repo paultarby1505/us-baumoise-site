@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { getMatch, getMatchComposition } from "@/lib/queries";
 import { siteConfig } from "@/lib/config";
 import { HouseIcon, BusIcon } from "@/components/MatchTypeIcons";
+import CompositionPitch from "@/components/CompositionPitch";
+import MatchTabs from "@/components/MatchTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +52,33 @@ export default async function MatchDetailPage({
   const domicileLogo = match.domicile ? "/logo.png" : match.adversaire_logo_url;
   const exterieurLogo = match.domicile ? match.adversaire_logo_url : "/logo.png";
   const joue = match.score_us !== null && match.score_adverse !== null;
+
+  const infoTab = (
+    <div>
+      {match.affiche_url ? (
+        <div className="overflow-hidden rounded-lg border border-black/10">
+          <Image
+            src={match.affiche_url}
+            alt="Affiche du match"
+            width={1000}
+            height={1400}
+            className="h-auto w-full"
+          />
+        </div>
+      ) : (
+        <p className="text-foreground/60">Pas d&apos;affiche pour ce match.</p>
+      )}
+    </div>
+  );
+
+  const compositionTab =
+    composition.length > 0 ? (
+      <CompositionPitch composition={composition} />
+    ) : (
+      <p className="text-foreground/60">
+        Composition à venir, reste à l&apos;affût !
+      </p>
+    );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
@@ -116,49 +145,11 @@ export default async function MatchDetailPage({
         )}
       </div>
 
-      {match.affiche_url && (
-        <div className="mt-8 overflow-hidden rounded-lg border border-black/10">
-          <Image
-            src={match.affiche_url}
-            alt="Affiche du match"
-            width={1000}
-            height={1400}
-            className="h-auto w-full"
-          />
-        </div>
-      )}
-
-      <section className="mt-8">
-        <h2 className="text-lg font-bold text-club-gold">Composition</h2>
-        {composition.length > 0 ? (
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            {composition.map((joueur) => (
-              <div
-                key={joueur.id}
-                className="flex items-center gap-3 rounded border border-black/10 p-3"
-              >
-                {joueur.numero !== null && (
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-club-gold text-sm font-bold text-black">
-                    {joueur.numero}
-                  </span>
-                )}
-                <div>
-                  <p className="font-semibold">
-                    {joueur.prenom} {joueur.nom}
-                  </p>
-                  {joueur.poste && (
-                    <p className="text-xs text-foreground/50">{joueur.poste}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-4 text-foreground/60">
-            Composition à venir, reste à l&apos;affût !
-          </p>
-        )}
-      </section>
+      <MatchTabs
+        defaultTab={composition.length > 0 ? "composition" : "infos"}
+        infoTab={infoTab}
+        compositionTab={compositionTab}
+      />
     </div>
   );
 }

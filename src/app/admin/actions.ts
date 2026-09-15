@@ -500,11 +500,28 @@ export async function deleteMatch(id: string) {
 
 export async function updateMatchComposition(matchId: string, formData: FormData) {
   const supabase = await createServerSupabaseClient();
-  const joueurIds = formData.getAll("joueurs").map(String);
+  const raw = str(formData, "composition");
+
+  let entries: { slot: number; joueur_id: string }[] = [];
+  try {
+    entries = raw ? JSON.parse(raw) : [];
+  } catch {
+    redirect(`/admin/matchs/${matchId}?error=${encodeURIComponent("Composition invalide")}`);
+  }
+
+  const valid = entries.filter(
+    (e) =>
+      e &&
+      Number.isInteger(e.slot) &&
+      e.slot >= 1 &&
+      e.slot <= 15 &&
+      typeof e.joueur_id === "string" &&
+      e.joueur_id.length > 0
+  );
 
   await supabase.from("match_compositions").delete().eq("match_id", matchId);
-  if (joueurIds.length > 0) {
-    const rows = joueurIds.map((joueur_id) => ({ match_id: matchId, joueur_id }));
+  if (valid.length > 0) {
+    const rows = valid.map((e) => ({ match_id: matchId, slot: e.slot, joueur_id: e.joueur_id }));
     const { error } = await supabase.from("match_compositions").insert(rows);
     if (error) {
       redirect(`/admin/matchs/${matchId}?error=${encodeURIComponent(error.message)}`);

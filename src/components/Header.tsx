@@ -122,14 +122,6 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-1">
-          <Link
-            href="/contact"
-            aria-label="Nous contacter"
-            className="flex h-9 w-9 items-center justify-center rounded text-white hover:text-club-gold-light"
-          >
-            <EnvelopeIcon />
-          </Link>
-
           {/* Bouton menu mobile */}
           <button
             type="button"
@@ -140,6 +132,14 @@ export default function Header() {
           >
             {open ? <CloseIcon /> : <BurgerIcon />}
           </button>
+
+          <Link
+            href="/contact"
+            aria-label="Nous contacter"
+            className="flex h-9 w-9 items-center justify-center rounded text-white hover:text-club-gold-light"
+          >
+            <EnvelopeIcon />
+          </Link>
         </div>
       </div>
 

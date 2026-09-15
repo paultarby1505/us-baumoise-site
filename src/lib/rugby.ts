@@ -79,12 +79,9 @@ export const COMPOSITION_ROWS: number[][] = [
   [15],
 ];
 
-// Regroupements affichés en bulles sur l'accueil pour choisir le prochain
-// match par catégorie. EDR (École De Rugby) rassemble les plus jeunes.
-export const MATCH_FILTERS: { key: string; label: string; categories: string[] }[] = [
-  { key: "seniors", label: "Seniors", categories: ["Seniors"] },
-  { key: "u19", label: "U19", categories: ["U19"] },
-  { key: "u16", label: "U16", categories: ["U16"] },
-  { key: "u14", label: "U14", categories: ["U14"] },
-  { key: "edr", label: "EDR", categories: ["Baby", "U6", "U8", "U10", "U12"] },
-];
+// Catégories utilisées pour les matchs : les jeunes catégories (Baby à
+// U12) jouent en plateaux communs, regroupés sous "EDR" (École De Rugby)
+// plutôt que d'avoir une catégorie de match par tranche d'âge. C'est aussi
+// la liste des bulles affichées sur l'accueil pour choisir le prochain
+// match par catégorie.
+export const MATCH_CATEGORIES = ["Seniors", "U19", "U16", "U14", "EDR"] as const;

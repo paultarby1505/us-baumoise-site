@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import MatchCard from "@/components/MatchCard";
-import { MATCH_FILTERS } from "@/lib/rugby";
+import { MATCH_CATEGORIES } from "@/lib/rugby";
 import type { Match } from "@/lib/types";
 
 export default function ProchainMatchParCategorie({
@@ -12,16 +12,11 @@ export default function ProchainMatchParCategorie({
   matchs: Match[];
   now: number;
 }) {
-  const [selected, setSelected] = useState(MATCH_FILTERS[0].key);
+  const [selected, setSelected] = useState<string>(MATCH_CATEGORIES[0]);
 
   const prochainMatch = useMemo(() => {
-    const filtre = MATCH_FILTERS.find((f) => f.key === selected);
-    if (!filtre) return null;
     const candidats = matchs
-      .filter(
-        (m) =>
-          filtre.categories.includes(m.categorie) && new Date(m.date_match).getTime() >= now
-      )
+      .filter((m) => m.categorie === selected && new Date(m.date_match).getTime() >= now)
       .sort((a, b) => new Date(a.date_match).getTime() - new Date(b.date_match).getTime());
     return candidats[0] ?? null;
   }, [matchs, selected, now]);
@@ -29,18 +24,18 @@ export default function ProchainMatchParCategorie({
   return (
     <div>
       <div className="flex flex-wrap gap-2">
-        {MATCH_FILTERS.map((f) => (
+        {MATCH_CATEGORIES.map((cat) => (
           <button
-            key={f.key}
+            key={cat}
             type="button"
-            onClick={() => setSelected(f.key)}
+            onClick={() => setSelected(cat)}
             className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
-              selected === f.key
+              selected === cat
                 ? "bg-club-gold text-black"
                 : "bg-black/5 text-foreground/70 hover:bg-black/10"
             }`}
           >
-            {f.label}
+            {cat}
           </button>
         ))}
       </div>

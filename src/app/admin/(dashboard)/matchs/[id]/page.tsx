@@ -6,7 +6,7 @@ import { updateMatch, deleteMatch } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import ImagePickerField from "@/components/ImagePickerField";
 import CompositionBuilder from "@/components/CompositionBuilder";
-import { CATEGORIES, categoryRank } from "@/lib/rugby";
+import { MATCH_CATEGORIES, categoryRank } from "@/lib/rugby";
 
 function toDatetimeLocal(iso: string): string {
   const date = new Date(iso);
@@ -93,7 +93,7 @@ export default async function EditMatchPage({
             required
             className="mt-1 w-full rounded border border-black/20 bg-white px-3 py-2"
           >
-            {CATEGORIES.map((cat) => (
+            {MATCH_CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
               </option>

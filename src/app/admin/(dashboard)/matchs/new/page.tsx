@@ -1,5 +1,5 @@
 import { createMatch } from "@/app/admin/actions";
-import { CATEGORIES } from "@/lib/rugby";
+import { MATCH_CATEGORIES } from "@/lib/rugby";
 import ImagePickerField from "@/components/ImagePickerField";
 
 export default async function NewMatchPage({
@@ -41,7 +41,7 @@ export default async function NewMatchPage({
             required
             className="mt-1 w-full rounded border border-black/20 bg-white px-3 py-2"
           >
-            {CATEGORIES.map((cat) => (
+            {MATCH_CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
               </option>

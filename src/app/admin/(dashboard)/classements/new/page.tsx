@@ -48,7 +48,7 @@ export default async function NewClassementPage({
           Pas besoin de définir un ordre : le classement se trie automatiquement (points, puis
           différence, puis points marqués) à chaque enregistrement.
         </p>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <label className="block text-sm font-medium">
             J
             <input

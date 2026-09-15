@@ -9,7 +9,7 @@ export default async function Footer() {
   return (
     <footer className="mt-auto bg-club-black text-white/80 border-t-2 border-club-gold">
       <div className="mx-auto max-w-5xl px-4 py-8 text-sm">
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <Image src="/logo.png" alt="" width={64} height={40} className="h-10 w-auto" />
           <div>
             <p className="font-semibold text-white">{siteConfig.name}</p>

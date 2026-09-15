@@ -81,6 +81,7 @@ export default async function NewJoueurPage({
           name="photo"
           label="Photo (optionnelle)"
           helpText="Si aucune photo n'est fournie, une silhouette par défaut sera affichée."
+          aspect={3 / 4}
         />
         <button
           type="submit"

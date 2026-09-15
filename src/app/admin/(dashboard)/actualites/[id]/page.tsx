@@ -83,11 +83,13 @@ export default async function EditActualitePage({
         <ImagePickerField
           name="image"
           label={actualite.image_url ? "Remplacer la photo de couverture" : "Photo de couverture (optionnelle)"}
+          aspect={16 / 9}
         />
         <MultiImagePickerField
           name="photos"
           label="Ajouter des photos à la galerie de cet article"
           helpText="Elles s'ajoutent à celles déjà présentes ci-dessous."
+          aspect={1}
         />
         <div className="flex items-center gap-4">
           <button

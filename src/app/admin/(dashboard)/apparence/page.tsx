@@ -46,6 +46,7 @@ export default async function ApparencePage({
           label={settings?.hero_image_url ? "Remplacer la photo" : "Choisir une photo"}
           required
           helpText="Une image large et pas trop chargée fonctionne mieux (le texte du site s'affiche par-dessus, avec un fond assombri automatique)."
+          aspect={16 / 6}
         />
         <button
           type="submit"

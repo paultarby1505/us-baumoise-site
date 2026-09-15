@@ -68,6 +68,7 @@ export default async function AdminCategorieHeaderPage({
           name="image"
           label={page?.header_image_url ? "Remplacer la photo" : "Photo d'en-tête (optionnelle)"}
           helpText="Sans photo, la catégorie garde le bandeau noir classique."
+          aspect={16 / 6}
         />
         <button
           type="submit"

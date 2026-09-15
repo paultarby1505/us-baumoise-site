@@ -397,12 +397,43 @@ export async function createMatch(formData: FormData) {
   if (!dateMatch) {
     redirect(`/admin/matchs/new?error=${encodeURIComponent("Date de match invalide")}`);
   }
+  const id = crypto.randomUUID();
+
+  let logoUrl: string | undefined;
+  let afficheUrl: string | undefined;
+  try {
+    logoUrl = await uploadImageIfProvided(
+      supabase,
+      formData,
+      "adversaire_logo",
+      "matchs-photos",
+      `${id}-logo`
+    );
+    afficheUrl = await uploadImageIfProvided(
+      supabase,
+      formData,
+      "affiche",
+      "matchs-photos",
+      `${id}-affiche`
+    );
+  } catch (e) {
+    redirect(
+      `/admin/matchs/new?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi d'une photo"
+      )}`
+    );
+  }
+
   const { error } = await supabase.from("matchs").insert({
+    id,
     adversaire: str(formData, "adversaire"),
+    adversaire_logo_url: logoUrl ?? null,
     domicile: formData.get("domicile") === "on",
     date_match: dateMatch,
     lieu: strOrNull(formData, "lieu"),
     competition: strOrNull(formData, "competition"),
+    categorie: str(formData, "categorie") || "Seniors",
+    affiche_url: afficheUrl ?? null,
     score_us: intOrNull(formData, "score_us"),
     score_adverse: intOrNull(formData, "score_adverse"),
   });
@@ -416,18 +447,46 @@ export async function updateMatch(id: string, formData: FormData) {
   if (!dateMatch) {
     redirect(`/admin/matchs/${id}?error=${encodeURIComponent("Date de match invalide")}`);
   }
-  const { error } = await supabase
-    .from("matchs")
-    .update({
-      adversaire: str(formData, "adversaire"),
-      domicile: formData.get("domicile") === "on",
-      date_match: dateMatch,
-      lieu: strOrNull(formData, "lieu"),
-      competition: strOrNull(formData, "competition"),
-      score_us: intOrNull(formData, "score_us"),
-      score_adverse: intOrNull(formData, "score_adverse"),
-    })
-    .eq("id", id);
+
+  let logoUrl: string | undefined;
+  let afficheUrl: string | undefined;
+  try {
+    logoUrl = await uploadImageIfProvided(
+      supabase,
+      formData,
+      "adversaire_logo",
+      "matchs-photos",
+      `${id}-logo`
+    );
+    afficheUrl = await uploadImageIfProvided(
+      supabase,
+      formData,
+      "affiche",
+      "matchs-photos",
+      `${id}-affiche`
+    );
+  } catch (e) {
+    redirect(
+      `/admin/matchs/${id}?error=${encodeURIComponent(
+        e instanceof Error ? e.message : "Échec de l'envoi d'une photo"
+      )}`
+    );
+  }
+
+  const updateData: Record<string, unknown> = {
+    adversaire: str(formData, "adversaire"),
+    domicile: formData.get("domicile") === "on",
+    date_match: dateMatch,
+    lieu: strOrNull(formData, "lieu"),
+    competition: strOrNull(formData, "competition"),
+    categorie: str(formData, "categorie") || "Seniors",
+    score_us: intOrNull(formData, "score_us"),
+    score_adverse: intOrNull(formData, "score_adverse"),
+  };
+  if (logoUrl) updateData.adversaire_logo_url = logoUrl;
+  if (afficheUrl) updateData.affiche_url = afficheUrl;
+
+  const { error } = await supabase.from("matchs").update(updateData).eq("id", id);
   if (error) redirect(`/admin/matchs/${id}?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/matchs");
 }
@@ -435,7 +494,23 @@ export async function updateMatch(id: string, formData: FormData) {
 export async function deleteMatch(id: string) {
   const supabase = await createServerSupabaseClient();
   await supabase.from("matchs").delete().eq("id", id);
+  await removeStoredImages(supabase, "matchs-photos", id);
   redirect("/admin/matchs");
+}
+
+export async function updateMatchComposition(matchId: string, formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  const joueurIds = formData.getAll("joueurs").map(String);
+
+  await supabase.from("match_compositions").delete().eq("match_id", matchId);
+  if (joueurIds.length > 0) {
+    const rows = joueurIds.map((joueur_id) => ({ match_id: matchId, joueur_id }));
+    const { error } = await supabase.from("match_compositions").insert(rows);
+    if (error) {
+      redirect(`/admin/matchs/${matchId}?error=${encodeURIComponent(error.message)}`);
+    }
+  }
+  redirect(`/admin/matchs/${matchId}?success=composition`);
 }
 
 // --- Apparence du site ---

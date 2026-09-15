@@ -38,7 +38,7 @@ export default async function AdminMatchsPage() {
                   : ""}
               </p>
               <p className="text-xs text-foreground/50">
-                {new Date(match.date_match).toLocaleString("fr-FR")}
+                {match.categorie} · {new Date(match.date_match).toLocaleString("fr-FR")}
                 {match.competition ? ` · ${match.competition}` : ""}
               </p>
             </div>

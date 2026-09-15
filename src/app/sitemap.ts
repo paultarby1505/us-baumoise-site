@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
-import { getActualites } from "@/lib/queries";
+import { getActualites, getMatchs } from "@/lib/queries";
 import { siteConfig } from "@/lib/config";
 import { CATEGORIES, categorySlug } from "@/lib/rugby";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const actualites = await getActualites();
+  const [actualites, matchs] = await Promise.all([getActualites(), getMatchs()]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteConfig.url, changeFrequency: "daily", priority: 1 },
@@ -29,5 +29,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticRoutes, ...categorieRoutes, ...newsRoutes];
+  const matchRoutes: MetadataRoute.Sitemap = matchs.map((match) => ({
+    url: `${siteConfig.url}/matchs/${match.id}`,
+    changeFrequency: "weekly",
+    priority: 0.4,
+  }));
+
+  return [...staticRoutes, ...categorieRoutes, ...newsRoutes, ...matchRoutes];
 }

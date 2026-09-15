@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { posteRank } from "./rugby";
 import type {
   Actualite,
   ActualitePhoto,
@@ -44,6 +45,29 @@ export async function getMatchs(): Promise<Match[]> {
     .order("date_match", { ascending: true });
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getMatch(id: string): Promise<Match | null> {
+  const { data, error } = await supabase
+    .from("matchs")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function getMatchComposition(matchId: string): Promise<Joueur[]> {
+  const { data, error } = await supabase
+    .from("match_compositions")
+    .select("joueur:joueurs(*)")
+    .eq("match_id", matchId);
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as { joueur: Joueur | null }[];
+  const joueurs = rows.map((row) => row.joueur).filter((j): j is Joueur => j !== null);
+  return joueurs.sort(
+    (a, b) => posteRank(a.poste) - posteRank(b.poste) || (a.numero ?? 999) - (b.numero ?? 999)
+  );
 }
 
 export async function getActualitePhotos(actualiteId: string): Promise<ActualitePhoto[]> {

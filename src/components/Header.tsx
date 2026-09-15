@@ -84,7 +84,7 @@ export default function Header() {
             className="h-11 w-auto shrink-0"
             priority
           />
-          <span className="whitespace-nowrap text-lg font-bold tracking-wide">
+          <span className="whitespace-nowrap font-heading text-lg font-bold tracking-wide">
             {siteConfig.shortName}
           </span>
         </Link>

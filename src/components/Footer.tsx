@@ -12,7 +12,7 @@ export default async function Footer() {
         <div className="flex items-start gap-4">
           <Image src="/logo.png" alt="" width={64} height={40} className="h-10 w-auto" />
           <div>
-            <p className="font-semibold text-white">{siteConfig.name}</p>
+            <p className="font-heading font-semibold text-white">{siteConfig.name}</p>
             <p className="mt-1">{siteConfig.ville} — Doubs</p>
             <p className="mt-1">
               <a href="mailto:secretariat.usb@orange.fr" className="hover:text-club-gold-light">

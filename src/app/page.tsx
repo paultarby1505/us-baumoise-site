@@ -1,11 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getActualites, getMatchs, getProchainsMatchs, getSiteSettings } from "@/lib/queries";
+import { getActualites, getMatchs, getSiteSettings } from "@/lib/queries";
 import NewsCard from "@/components/NewsCard";
-import MatchCard from "@/components/MatchCard";
+import ProchainMatchParCategorie from "@/components/ProchainMatchParCategorie";
 import { siteConfig } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
+
+function currentTimestamp(): number {
+  return Date.now();
+}
 
 export default async function HomePage() {
   const [actualites, matchs, settings] = await Promise.all([
@@ -13,7 +17,6 @@ export default async function HomePage() {
     getMatchs(),
     getSiteSettings(),
   ]);
-  const prochainMatch = getProchainsMatchs(matchs)[0];
   const dernieresActus = actualites.slice(0, 3);
   const heroImage = settings?.hero_image_url;
 
@@ -40,11 +43,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {prochainMatch && (
+      {matchs.length > 0 && (
         <section className="mx-auto max-w-5xl px-4 py-10">
           <h2 className="text-xl font-bold">Prochain match</h2>
           <div className="mt-4">
-            <MatchCard match={prochainMatch} />
+            <ProchainMatchParCategorie matchs={matchs} now={currentTimestamp()} />
           </div>
         </section>
       )}

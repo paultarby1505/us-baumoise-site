@@ -24,7 +24,11 @@ export default async function NewPartenairePage({
             className="mt-1 w-full rounded border border-black/20 px-3 py-2"
           />
         </label>
-        <ImagePickerField name="logo" label="Logo (optionnel)" aspect={1} />
+        <ImagePickerField
+          name="logo"
+          label="Logo (optionnel)"
+          helpText="Cadrage libre : garde la forme naturelle du logo (large, carré, haut...)."
+        />
         <label className="block text-sm font-medium">
           Résumé (une phrase, affichée sur la liste)
           <input

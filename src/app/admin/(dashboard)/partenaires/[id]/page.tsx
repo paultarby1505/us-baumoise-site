@@ -50,7 +50,7 @@ export default async function EditPartenairePage({
         <ImagePickerField
           name="logo"
           label={partenaire.logo_url ? "Remplacer le logo" : "Logo (optionnel)"}
-          aspect={1}
+          helpText="Cadrage libre : garde la forme naturelle du logo (large, carré, haut...)."
         />
         <label className="block text-sm font-medium">
           Résumé (une phrase, affichée sur la liste)

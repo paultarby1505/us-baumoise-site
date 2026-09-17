@@ -1,47 +1,31 @@
 import type { Metadata } from "next";
-import { getMatchs, getMatchsPasses, getProchainsMatchs } from "@/lib/queries";
-import MatchCard from "@/components/MatchCard";
+import { getMatchs, getMatchsAvenir } from "@/lib/queries";
+import MatchListByCategorie from "@/components/MatchListByCategorie";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Calendrier des matchs",
   description:
-    "Calendrier, résultats et lieux des matchs du club de rugby US Baumoise à Baume-les-Dames (Doubs), toutes catégories confondues.",
+    "Calendrier et lieux des prochains matchs du club de rugby US Baumoise à Baume-les-Dames (Doubs), par catégorie.",
 };
 
 export default async function MatchsPage() {
   const matchs = await getMatchs();
-  const prochains = getProchainsMatchs(matchs);
-  const passes = getMatchsPasses(matchs);
+  const avenir = getMatchsAvenir(matchs);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       <h1 className="text-2xl font-extrabold">Calendrier des matchs</h1>
+      <p className="mt-2 text-foreground/60">Choisis une catégorie pour voir ses prochains matchs.</p>
 
-      <section className="mt-8">
-        <h2 className="text-lg font-bold text-club-gold">À venir</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {prochains.map((match) => (
-            <MatchCard key={match.id} match={match} />
-          ))}
-          {prochains.length === 0 && (
-            <p className="text-foreground/60">Aucun match à venir programmé.</p>
-          )}
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-lg font-bold text-club-gold">Résultats</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {passes.map((match) => (
-            <MatchCard key={match.id} match={match} />
-          ))}
-          {passes.length === 0 && (
-            <p className="text-foreground/60">Aucun résultat pour le moment.</p>
-          )}
-        </div>
-      </section>
+      <div className="mt-6">
+        <MatchListByCategorie
+          matchs={avenir}
+          emptyText="Aucun match à venir pour cette catégorie."
+          tri="asc"
+        />
+      </div>
     </div>
   );
 }

@@ -166,15 +166,20 @@ export async function getClassement(categorie: string): Promise<ClassementLigne[
   return (data ?? []).sort(compareClassement);
 }
 
-export function getProchainsMatchs(matchs: Match[]): Match[] {
+// Un match ne bascule en résultat que 5h après son coup d'envoi (le temps du
+// match, du retour et de la saisie du score par un bénévole) : avant ça, il
+// reste affiché comme "à venir" même si l'heure de coup d'envoi est passée.
+const DELAI_RESULTAT_MS = 5 * 60 * 60 * 1000;
+
+export function getMatchsAvenir(matchs: Match[]): Match[] {
   const now = Date.now();
-  return matchs.filter((m) => new Date(m.date_match).getTime() >= now);
+  return matchs.filter((m) => new Date(m.date_match).getTime() + DELAI_RESULTAT_MS > now);
 }
 
-export function getMatchsPasses(matchs: Match[]): Match[] {
+export function getResultats(matchs: Match[]): Match[] {
   const now = Date.now();
   return matchs
-    .filter((m) => new Date(m.date_match).getTime() < now)
+    .filter((m) => new Date(m.date_match).getTime() + DELAI_RESULTAT_MS <= now)
     .sort(
       (a, b) => new Date(b.date_match).getTime() - new Date(a.date_match).getTime()
     );

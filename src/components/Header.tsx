@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/actualites", label: "Actualités" },
   { href: "/effectif", label: "Catégorie" },
   { href: "/matchs", label: "Matchs" },
+  { href: "/resultats", label: "Résultats" },
   { href: "/classements", label: "Classements" },
   { href: "/partenaires", label: "Partenaires" },
   { href: "/galerie", label: "Galerie" },
@@ -125,6 +126,12 @@ export default function Header() {
             className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
           >
             Matchs
+          </Link>
+          <Link
+            href="/resultats"
+            className="rounded-full px-3 py-1.5 transition-colors hover:bg-club-gold hover:text-black"
+          >
+            Résultats
           </Link>
           <Link
             href="/classements"

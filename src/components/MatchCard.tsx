@@ -33,6 +33,15 @@ function LogoCluster({ logos, alt }: { logos: string[]; alt: string }) {
   );
 }
 
+function EquipeColonne({ nom, logos }: { nom: string; logos: string[] }) {
+  return (
+    <div className="flex min-w-0 flex-col items-center gap-1 text-center font-semibold">
+      <LogoCluster logos={logos} alt={`Logo ${nom}`} />
+      <span className="min-w-0">{nom}</span>
+    </div>
+  );
+}
+
 function OpposantRow({
   nom,
   logos,
@@ -46,9 +55,9 @@ function OpposantRow({
 }) {
   const joue = scoreUs !== null && scoreAdverse !== null;
   return (
-    <div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-      <span className="font-semibold">{siteConfig.shortName}</span>
-      <span className="w-16 shrink-0 text-center">
+    <div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
+      <div className="pt-1 text-center font-semibold">{siteConfig.shortName}</div>
+      <div className="w-16 shrink-0 pt-1 text-center">
         {joue ? (
           <span className="font-bold text-club-gold">
             {scoreUs} - {scoreAdverse}
@@ -56,11 +65,8 @@ function OpposantRow({
         ) : (
           <span className="text-sm text-foreground/50">vs</span>
         )}
-      </span>
-      <span className="flex min-w-0 items-center justify-end gap-2 text-right font-semibold">
-        <span className="min-w-0">{nom}</span>
-        <LogoCluster logos={logos} alt={`Logo ${nom}`} />
-      </span>
+      </div>
+      <EquipeColonne nom={nom} logos={logos} />
     </div>
   );
 }
@@ -69,6 +75,11 @@ export default function MatchCard({ match }: { match: Match }) {
   const joue = match.score_us !== null && match.score_adverse !== null;
   const isTriangulaire = Boolean(match.adversaire && match.adversaire2);
   const isTournoi = !match.adversaire;
+
+  const domicileNom = match.domicile ? siteConfig.shortName : match.adversaire!;
+  const exterieurNom = match.domicile ? match.adversaire! : siteConfig.shortName;
+  const domicileLogos = match.domicile ? [] : match.adversaire_logos;
+  const exterieurLogos = match.domicile ? match.adversaire_logos : [];
 
   return (
     <Link
@@ -124,16 +135,9 @@ export default function MatchCard({ match }: { match: Match }) {
           />
         </div>
       ) : (
-        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <span className="flex min-w-0 items-center gap-2 font-semibold">
-            {!match.domicile && (
-              <LogoCluster logos={match.adversaire_logos} alt={`Logo ${match.adversaire}`} />
-            )}
-            <span className="min-w-0">
-              {match.domicile ? siteConfig.shortName : match.adversaire}
-            </span>
-          </span>
-          <span className="w-16 shrink-0 text-center">
+        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
+          <EquipeColonne nom={domicileNom} logos={domicileLogos} />
+          <div className="w-16 shrink-0 pt-1 text-center">
             {joue ? (
               <span className="font-bold text-club-gold">
                 {match.domicile ? match.score_us : match.score_adverse} -{" "}
@@ -142,15 +146,8 @@ export default function MatchCard({ match }: { match: Match }) {
             ) : (
               <span className="text-sm text-foreground/50">vs</span>
             )}
-          </span>
-          <span className="flex min-w-0 items-center justify-end gap-2 text-right font-semibold">
-            <span className="min-w-0">
-              {match.domicile ? match.adversaire : siteConfig.shortName}
-            </span>
-            {match.domicile && (
-              <LogoCluster logos={match.adversaire_logos} alt={`Logo ${match.adversaire}`} />
-            )}
-          </span>
+          </div>
+          <EquipeColonne nom={exterieurNom} logos={exterieurLogos} />
         </div>
       )}
 

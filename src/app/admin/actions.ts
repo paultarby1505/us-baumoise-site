@@ -387,6 +387,7 @@ export async function createMatch(formData: FormData) {
   const id = crypto.randomUUID();
 
   let logoUrl: string | undefined;
+  let logo2Url: string | undefined;
   let afficheUrl: string | undefined;
   try {
     logoUrl = await uploadImageIfProvided(
@@ -395,6 +396,13 @@ export async function createMatch(formData: FormData) {
       "adversaire_logo",
       "matchs-photos",
       `${id}-logo`
+    );
+    logo2Url = await uploadImageIfProvided(
+      supabase,
+      formData,
+      "adversaire2_logo",
+      "matchs-photos",
+      `${id}-logo2`
     );
     afficheUrl = await uploadImageIfProvided(
       supabase,
@@ -411,9 +419,11 @@ export async function createMatch(formData: FormData) {
     );
   }
 
+  const adversaire2 = strOrNull(formData, "adversaire2");
+
   const { error } = await supabase.from("matchs").insert({
     id,
-    adversaire: str(formData, "adversaire"),
+    adversaire: strOrNull(formData, "adversaire"),
     adversaire_logo_url: logoUrl ?? null,
     domicile: formData.get("domicile") === "on",
     date_match: dateMatch,
@@ -423,6 +433,11 @@ export async function createMatch(formData: FormData) {
     affiche_url: afficheUrl ?? null,
     score_us: intOrNull(formData, "score_us"),
     score_adverse: intOrNull(formData, "score_adverse"),
+    nom_tournoi: strOrNull(formData, "nom_tournoi"),
+    adversaire2,
+    adversaire2_logo_url: adversaire2 ? logo2Url ?? null : null,
+    score_us2: intOrNull(formData, "score_us2"),
+    score_adverse2: intOrNull(formData, "score_adverse2"),
   });
   if (error) redirect(`/admin/matchs/new?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/matchs");
@@ -436,6 +451,7 @@ export async function updateMatch(id: string, formData: FormData) {
   }
 
   let logoUrl: string | undefined;
+  let logo2Url: string | undefined;
   let afficheUrl: string | undefined;
   try {
     logoUrl = await uploadImageIfProvided(
@@ -444,6 +460,13 @@ export async function updateMatch(id: string, formData: FormData) {
       "adversaire_logo",
       "matchs-photos",
       `${id}-logo`
+    );
+    logo2Url = await uploadImageIfProvided(
+      supabase,
+      formData,
+      "adversaire2_logo",
+      "matchs-photos",
+      `${id}-logo2`
     );
     afficheUrl = await uploadImageIfProvided(
       supabase,
@@ -460,8 +483,10 @@ export async function updateMatch(id: string, formData: FormData) {
     );
   }
 
+  const adversaire2 = strOrNull(formData, "adversaire2");
+
   const updateData: Record<string, unknown> = {
-    adversaire: str(formData, "adversaire"),
+    adversaire: strOrNull(formData, "adversaire"),
     domicile: formData.get("domicile") === "on",
     date_match: dateMatch,
     lieu: strOrNull(formData, "lieu"),
@@ -469,9 +494,18 @@ export async function updateMatch(id: string, formData: FormData) {
     categorie: str(formData, "categorie") || "Seniors",
     score_us: intOrNull(formData, "score_us"),
     score_adverse: intOrNull(formData, "score_adverse"),
+    nom_tournoi: strOrNull(formData, "nom_tournoi"),
+    adversaire2,
+    score_us2: intOrNull(formData, "score_us2"),
+    score_adverse2: intOrNull(formData, "score_adverse2"),
   };
   if (logoUrl) updateData.adversaire_logo_url = logoUrl;
   if (afficheUrl) updateData.affiche_url = afficheUrl;
+  if (!adversaire2) {
+    updateData.adversaire2_logo_url = null;
+  } else if (logo2Url) {
+    updateData.adversaire2_logo_url = logo2Url;
+  }
 
   const { error } = await supabase.from("matchs").update(updateData).eq("id", id);
   if (error) redirect(`/admin/matchs/${id}?error=${encodeURIComponent(error.message)}`);

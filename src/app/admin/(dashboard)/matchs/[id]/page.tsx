@@ -4,9 +4,10 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getJoueurs, getMatchComposition } from "@/lib/queries";
 import { updateMatch, deleteMatch } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
-import ImagePickerField from "@/components/ImagePickerField";
 import CompositionBuilder from "@/components/CompositionBuilder";
-import { MATCH_CATEGORIES, categoryRank } from "@/lib/rugby";
+import MatchFormFields from "@/components/MatchFormFields";
+import { categoryRank } from "@/lib/rugby";
+import type { Match } from "@/lib/types";
 
 function toDatetimeLocal(iso: string): string {
   const date = new Date(iso);
@@ -26,11 +27,8 @@ export default async function EditMatchPage({
   const { id } = await params;
   const { error, success } = await searchParams;
   const supabase = await createServerSupabaseClient();
-  const { data: match } = await supabase
-    .from("matchs")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  const { data } = await supabase.from("matchs").select("*").eq("id", id).maybeSingle();
+  const match = data as Match | null;
 
   if (!match) notFound();
 
@@ -60,104 +58,41 @@ export default async function EditMatchPage({
         </p>
       )}
 
-      {match.adversaire_logo_url && (
-        <div className="relative mt-4 h-16 w-16 overflow-hidden rounded-full border border-black/10">
-          <Image src={match.adversaire_logo_url} alt="" fill className="object-cover" sizes="64px" />
+      {(match.adversaire_logo_url || match.adversaire2_logo_url) && (
+        <div className="mt-4 flex gap-4">
+          {match.adversaire_logo_url && (
+            <div className="relative h-16 w-16 overflow-hidden rounded-full border border-black/10">
+              <Image src={match.adversaire_logo_url} alt="" fill className="object-cover" sizes="64px" />
+            </div>
+          )}
+          {match.adversaire2_logo_url && (
+            <div className="relative h-16 w-16 overflow-hidden rounded-full border border-black/10">
+              <Image src={match.adversaire2_logo_url} alt="" fill className="object-cover" sizes="64px" />
+            </div>
+          )}
         </div>
       )}
 
       <form action={updateMatch.bind(null, id)} className="mt-6 max-w-md space-y-4">
-        <label className="block text-sm font-medium">
-          Adversaire
-          <input
-            type="text"
-            name="adversaire"
-            defaultValue={match.adversaire}
-            required
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
-        <ImagePickerField
-          name="adversaire_logo"
-          label={match.adversaire_logo_url ? "Remplacer le logo de l'adversaire" : "Logo de l'adversaire (optionnel)"}
-          aspect={1}
+        <MatchFormFields
+          initial={{
+            categorie: match.categorie,
+            adversaire: match.adversaire ?? "",
+            domicile: match.domicile,
+            date_match: toDatetimeLocal(match.date_match),
+            lieu: match.lieu ?? "",
+            competition: match.competition ?? "",
+            nom_tournoi: match.nom_tournoi ?? "",
+            adversaire2: match.adversaire2 ?? "",
+            score_us: match.score_us ?? "",
+            score_adverse: match.score_adverse ?? "",
+            score_us2: match.score_us2 ?? "",
+            score_adverse2: match.score_adverse2 ?? "",
+            adversaire_logo_url: match.adversaire_logo_url,
+            adversaire2_logo_url: match.adversaire2_logo_url,
+            affiche_url: match.affiche_url,
+          }}
         />
-        <label className="flex items-center gap-2 text-sm font-medium">
-          <input type="checkbox" name="domicile" defaultChecked={match.domicile} />À domicile
-        </label>
-        <label className="block text-sm font-medium">
-          Catégorie
-          <select
-            name="categorie"
-            defaultValue={match.categorie}
-            required
-            className="mt-1 w-full rounded border border-black/20 bg-white px-3 py-2"
-          >
-            {MATCH_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm font-medium">
-          Date et heure
-          <input
-            type="datetime-local"
-            name="date_match"
-            defaultValue={toDatetimeLocal(match.date_match)}
-            required
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
-        <label className="block text-sm font-medium">
-          Lieu (optionnel)
-          <input
-            type="text"
-            name="lieu"
-            defaultValue={match.lieu ?? ""}
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
-        <label className="block text-sm font-medium">
-          Compétition (optionnel)
-          <input
-            type="text"
-            name="competition"
-            defaultValue={match.competition ?? ""}
-            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-          />
-        </label>
-        <ImagePickerField
-          name="affiche"
-          label={match.affiche_url ? "Remplacer l'affiche du match" : "Affiche du match (optionnelle)"}
-        />
-        <div className="grid grid-cols-2 gap-4">
-          <label className="block text-sm font-medium">
-            Score US Baumoise
-            <input
-              type="number"
-              name="score_us"
-              min={0}
-              defaultValue={match.score_us ?? ""}
-              className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-            />
-          </label>
-          <label className="block text-sm font-medium">
-            Score adverse
-            <input
-              type="number"
-              name="score_adverse"
-              min={0}
-              defaultValue={match.score_adverse ?? ""}
-              className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-            />
-          </label>
-        </div>
-        <p className="text-xs text-foreground/50">
-          Laisse les scores vides pour un match pas encore joué. Renseigne-les une fois le
-          match terminé pour afficher le résultat.
-        </p>
         <button
           type="submit"
           className="rounded bg-club-gold px-4 py-2 font-semibold text-black hover:bg-club-gold-light"

@@ -29,13 +29,20 @@ export default async function AdminMatchsPage() {
           <div key={match.id} className="flex items-center justify-between gap-4 p-4">
             <div>
               <p className="font-semibold">
-                {match.domicile ? "US Baumoise" : match.adversaire} vs{" "}
-                {match.domicile ? match.adversaire : "US Baumoise"}
-                {match.score_us !== null && match.score_adverse !== null
-                  ? ` — ${match.domicile ? match.score_us : match.score_adverse}-${
-                      match.domicile ? match.score_adverse : match.score_us
-                    }`
-                  : ""}
+                {match.nom_tournoi
+                  ? match.nom_tournoi
+                  : match.adversaire
+                    ? `${match.domicile ? "US Baumoise" : match.adversaire} vs ${
+                        match.domicile ? match.adversaire : "US Baumoise"
+                      }${
+                        match.score_us !== null && match.score_adverse !== null
+                          ? ` — ${match.domicile ? match.score_us : match.score_adverse}-${
+                              match.domicile ? match.score_adverse : match.score_us
+                            }`
+                          : ""
+                      }`
+                    : "Plateau / tournoi"}
+                {match.adversaire2 ? ` + ${match.adversaire2}` : ""}
               </p>
               <p className="text-xs text-foreground/50">
                 {match.categorie} · {new Date(match.date_match).toLocaleString("fr-FR")}

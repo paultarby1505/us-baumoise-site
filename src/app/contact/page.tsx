@@ -3,7 +3,8 @@ import { createContact } from "@/app/actions";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Contacter le club US Baumoise Rugby.",
+  description:
+    "Contacter le club de rugby US Baumoise à Baume-les-Dames (Doubs) : inscriptions, questions, demandes.",
 };
 
 export default async function ContactPage({

@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Galerie",
-  description: "Toutes les photos du club US Baumoise Rugby.",
+  description:
+    "Toutes les photos du club de rugby US Baumoise à Baume-les-Dames (Doubs) : matchs, événements et vie du club.",
 };
 
 export default async function GaleriePage() {

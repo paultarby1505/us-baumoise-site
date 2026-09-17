@@ -17,7 +17,7 @@ export default function CompositionPitch({ composition }: { composition: Composi
                   {joueur?.photo_url ? (
                     <Image
                       src={joueur.photo_url}
-                      alt=""
+                      alt={`${joueur.prenom} ${joueur.nom}`}
                       fill
                       className="object-cover"
                       sizes="64px"

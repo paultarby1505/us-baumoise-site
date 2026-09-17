@@ -41,7 +41,7 @@ export default function MatchCard({ match }: { match: Match }) {
           {!match.domicile && adversaireLogo && (
             <Image
               src={adversaireLogo}
-              alt=""
+              alt={`Logo ${match.adversaire}`}
               width={24}
               height={24}
               className="h-6 w-6 shrink-0 rounded-full object-cover"
@@ -62,7 +62,7 @@ export default function MatchCard({ match }: { match: Match }) {
           {match.domicile && adversaireLogo && (
             <Image
               src={adversaireLogo}
-              alt=""
+              alt={`Logo ${match.adversaire}`}
               width={24}
               height={24}
               className="h-6 w-6 shrink-0 rounded-full object-cover"

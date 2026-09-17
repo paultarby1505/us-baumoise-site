@@ -10,12 +10,17 @@ export default function StructuredData() {
     logo: `${siteConfig.url}/logo.png`,
     sport: "Rugby",
     foundingDate: "1995",
+    email: "secretariat.usb@orange.fr",
     address: {
       "@type": "PostalAddress",
       addressLocality: siteConfig.ville,
       addressRegion: "Doubs",
       addressCountry: "FR",
     },
+    sameAs: [
+      "https://www.instagram.com/usbaumoise_rugby/",
+      "https://www.facebook.com/USBIOfficiel/",
+    ],
   };
 
   return (

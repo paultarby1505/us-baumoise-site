@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Partenaires",
-  description: "Les partenaires qui soutiennent le club US Baumoise Rugby.",
+  description:
+    "Les entreprises et commerces de Baume-les-Dames et sa région qui soutiennent le club de rugby US Baumoise.",
 };
 
 export default async function PartenairesPage() {
@@ -32,7 +33,7 @@ export default async function PartenairesPage() {
                 {partenaire.logo_url ? (
                   <Image
                     src={partenaire.logo_url}
-                    alt=""
+                    alt={`Logo ${partenaire.nom}`}
                     fill
                     className="object-contain object-left"
                     sizes="200px"

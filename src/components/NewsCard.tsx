@@ -20,7 +20,7 @@ export default function NewsCard({ actualite }: { actualite: Actualite }) {
         <div className="relative aspect-[16/9] w-full">
           <Image
             src={actualite.image_url}
-            alt=""
+            alt={actualite.titre}
             fill
             className="object-cover"
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"

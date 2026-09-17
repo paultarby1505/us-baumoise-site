@@ -18,7 +18,7 @@ export async function generateMetadata({
   if (!categorie) return {};
   return {
     title: `Effectif ${categorie}`,
-    description: `Les joueurs de la catégorie ${categorie} de l'US Baumoise Rugby.`,
+    description: `Les joueurs de la catégorie ${categorie} du club de rugby US Baumoise à Baume-les-Dames (Doubs).`,
   };
 }
 

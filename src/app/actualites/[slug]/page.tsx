@@ -50,7 +50,7 @@ export default async function ActualitePage({
         <div className="relative mb-8 aspect-[16/9] w-full overflow-hidden rounded-lg">
           <Image
             src={actualite.image_url}
-            alt=""
+            alt={actualite.titre}
             fill
             priority
             className="object-cover"
@@ -84,7 +84,7 @@ export default async function ActualitePage({
               >
                 <Image
                   src={photo.url}
-                  alt=""
+                  alt={actualite.titre}
                   fill
                   className="object-cover transition-transform hover:scale-105"
                   sizes="(min-width: 640px) 33vw, 50vw"

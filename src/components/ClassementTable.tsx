@@ -69,7 +69,7 @@ export default function ClassementTable({ lignes }: { lignes: ClassementLigne[] 
                           {ligne.logo_url && (
                             <Image
                               src={ligne.logo_url}
-                              alt=""
+                              alt={`Logo ${ligne.equipe}`}
                               fill
                               className="object-contain p-0.5"
                               sizes="24px"

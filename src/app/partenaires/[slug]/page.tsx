@@ -45,7 +45,7 @@ export default async function PartenairePage({
           <div className="relative h-24 w-40 shrink-0">
             <Image
               src={partenaire.logo_url}
-              alt=""
+              alt={`Logo ${partenaire.nom}`}
               fill
               className="object-contain object-left"
               sizes="160px"

@@ -108,7 +108,7 @@ export default async function MatchDetailPage({
             {domicileLogo && (
               <Image
                 src={domicileLogo}
-                alt=""
+                alt={`Logo ${domicileNom}`}
                 width={64}
                 height={64}
                 className="h-12 w-12 object-contain sm:h-16 sm:w-16"
@@ -130,7 +130,7 @@ export default async function MatchDetailPage({
             {exterieurLogo && (
               <Image
                 src={exterieurLogo}
-                alt=""
+                alt={`Logo ${exterieurNom}`}
                 width={64}
                 height={64}
                 className="h-12 w-12 object-contain sm:h-16 sm:w-16"

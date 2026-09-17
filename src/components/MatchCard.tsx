@@ -79,17 +79,19 @@ export default function MatchCard({ match }: { match: Match }) {
       href={`/matchs/${match.id}`}
       className="block rounded-lg border-2 border-black p-5 transition-shadow hover:shadow-md"
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs font-semibold uppercase tracking-wide text-club-gold">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-xs font-semibold uppercase tracking-wide text-club-gold">
         <span>
           {match.categorie}
           {match.competition ? ` · ${match.competition}` : ""}
         </span>
-        <span className="flex items-center gap-1 normal-case text-foreground/50">
+        <span className="whitespace-nowrap text-center text-sm">
+          {formatDate(match.date_match)}
+        </span>
+        <span className="flex items-center justify-end gap-1 normal-case text-foreground/50">
           {match.domicile ? <HouseIcon /> : <BusIcon />}
           {match.domicile ? "Domicile" : "Extérieur"}
         </span>
       </div>
-      <p className="mt-1 text-xs font-semibold text-club-gold">{formatDate(match.date_match)}</p>
 
       {isTournoi ? (
         <div className="mt-2 flex flex-col items-center gap-2 text-center">

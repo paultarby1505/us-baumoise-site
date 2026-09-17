@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Actualite } from "@/lib/types";
+import { formatParis } from "@/lib/date-fr";
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+  return formatParis(iso, {
     day: "numeric",
     month: "long",
     year: "numeric",

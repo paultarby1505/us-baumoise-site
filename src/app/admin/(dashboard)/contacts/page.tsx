@@ -2,9 +2,10 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { markContactLu, deleteContact } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import type { Contact } from "@/lib/types";
+import { formatParis } from "@/lib/date-fr";
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+  return formatParis(iso, {
     day: "numeric",
     month: "long",
     year: "numeric",

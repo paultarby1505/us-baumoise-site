@@ -8,14 +8,7 @@ import CompositionBuilder from "@/components/CompositionBuilder";
 import MatchFormFields from "@/components/MatchFormFields";
 import { categoryRank } from "@/lib/rugby";
 import type { Match } from "@/lib/types";
-
-function toDatetimeLocal(iso: string): string {
-  const date = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
-    date.getHours()
-  )}:${pad(date.getMinutes())}`;
-}
+import { utcIsoToParisInput } from "@/lib/date-fr";
 
 export default async function EditMatchPage({
   params,
@@ -79,7 +72,7 @@ export default async function EditMatchPage({
             categorie: match.categorie,
             adversaire: match.adversaire ?? "",
             domicile: match.domicile,
-            date_match: toDatetimeLocal(match.date_match),
+            date_match: utcIsoToParisInput(match.date_match),
             lieu: match.lieu ?? "",
             competition: match.competition ?? "",
             nom_tournoi: match.nom_tournoi ?? "",

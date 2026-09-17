@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { deleteMatch } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import type { Match } from "@/lib/types";
+import { formatParis } from "@/lib/date-fr";
 
 export default async function AdminMatchsPage() {
   const supabase = await createServerSupabaseClient();
@@ -45,7 +46,14 @@ export default async function AdminMatchsPage() {
                 {match.adversaire2 ? ` + ${match.adversaire2}` : ""}
               </p>
               <p className="text-xs text-foreground/50">
-                {match.categorie} · {new Date(match.date_match).toLocaleString("fr-FR")}
+                {match.categorie} ·{" "}
+                {formatParis(match.date_match, {
+                  day: "numeric",
+                  month: "numeric",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
                 {match.competition ? ` · ${match.competition}` : ""}
               </p>
             </div>

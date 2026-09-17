@@ -7,6 +7,7 @@ import { getCurrentProfile } from "@/lib/auth";
 import { slugify } from "@/lib/slugify";
 import { CATEGORIES, MATCH_CATEGORIES, categorySlug } from "@/lib/rugby";
 import { str, strOrNull, intOrNull } from "@/lib/form-data";
+import { parisInputToUtcIso } from "@/lib/date-fr";
 
 async function uploadImageIfProvided(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
@@ -374,8 +375,7 @@ export async function deleteJoueur(id: string) {
 function dateMatchToIso(formData: FormData): string | null {
   const value = str(formData, "date_match");
   if (!value) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  return parisInputToUtcIso(value);
 }
 
 export async function createMatch(formData: FormData) {

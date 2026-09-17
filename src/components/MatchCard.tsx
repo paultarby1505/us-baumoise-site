@@ -3,9 +3,10 @@ import Link from "next/link";
 import type { Match } from "@/lib/types";
 import { siteConfig } from "@/lib/config";
 import { HouseIcon, BusIcon } from "@/components/MatchTypeIcons";
+import { formatParis } from "@/lib/date-fr";
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+  return formatParis(iso, {
     weekday: "long",
     day: "numeric",
     month: "long",

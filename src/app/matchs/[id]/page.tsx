@@ -7,11 +7,12 @@ import { siteConfig } from "@/lib/config";
 import { HouseIcon, BusIcon } from "@/components/MatchTypeIcons";
 import CompositionPitch from "@/components/CompositionPitch";
 import MatchTabs from "@/components/MatchTabs";
+import { formatParis } from "@/lib/date-fr";
 
 export const dynamic = "force-dynamic";
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+  return formatParis(iso, {
     weekday: "long",
     day: "numeric",
     month: "long",

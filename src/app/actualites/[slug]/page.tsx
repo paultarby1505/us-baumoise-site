@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getActualite, getActualitePhotos } from "@/lib/queries";
+import { formatParis } from "@/lib/date-fr";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ export async function generateMetadata({
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+  return formatParis(iso, {
     day: "numeric",
     month: "long",
     year: "numeric",

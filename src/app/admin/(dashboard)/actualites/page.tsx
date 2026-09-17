@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { deleteActualite } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import type { Actualite } from "@/lib/types";
+import { formatParis } from "@/lib/date-fr";
 
 export default async function AdminActualitesPage() {
   const supabase = await createServerSupabaseClient();
@@ -30,7 +31,7 @@ export default async function AdminActualitesPage() {
             <div>
               <p className="font-semibold">{actu.titre}</p>
               <p className="text-xs text-foreground/50">
-                {new Date(actu.publie_le).toLocaleDateString("fr-FR")}
+                {formatParis(actu.publie_le, { day: "numeric", month: "numeric", year: "numeric" })}
               </p>
             </div>
             <div className="flex shrink-0 gap-3 text-sm">

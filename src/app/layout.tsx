@@ -30,11 +30,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: siteConfig.name,
     description: siteConfig.description,
+    images: ["/logo.png"],
   },
   twitter: {
     card: "summary",
     title: siteConfig.name,
     description: siteConfig.description,
+    images: ["/logo.png"],
   },
 };
 

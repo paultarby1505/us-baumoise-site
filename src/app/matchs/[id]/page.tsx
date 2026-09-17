@@ -96,7 +96,7 @@ export default async function MatchDetailPage({
         ← Calendrier des matchs
       </Link>
 
-      <div className="mt-4 rounded-lg border border-black/10 p-6">
+      <div className="mt-4 rounded-lg border-2 border-black p-6">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide text-club-gold">
           <span>
             {match.categorie}

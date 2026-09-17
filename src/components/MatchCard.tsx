@@ -77,7 +77,7 @@ export default function MatchCard({ match }: { match: Match }) {
   return (
     <Link
       href={`/matchs/${match.id}`}
-      className="block rounded-lg border border-black/10 p-5 transition-shadow hover:shadow-md"
+      className="block rounded-lg border-2 border-black p-5 transition-shadow hover:shadow-md"
     >
       <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs font-semibold uppercase tracking-wide text-club-gold">
         <span>

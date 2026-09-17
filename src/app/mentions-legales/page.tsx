@@ -17,10 +17,12 @@ export default function MentionsLegalesPage() {
           <h2 className="text-lg font-bold text-club-gold">Éditeur du site</h2>
           <p className="mt-2">
             Le site usbaumoise.fr est édité par l&apos;US Baumoise Rugby, association sportive
-            loi 1901, dont le siège est situé au Stade de la Prairie, Baume-les-Dames (Doubs).
+            loi 1901, dont le siège est situé au Stade de la Prairie, Baume-les-Dames (Doubs)
+            — SIREN 778 276 915.
           </p>
           <p className="mt-2">
-            Responsable de la publication : le/la Président(e) de l&apos;US Baumoise Rugby.
+            Responsable de la publication : Simon Courbet, Président de l&apos;US Baumoise
+            Rugby.
           </p>
           <p className="mt-2">
             Contact : <a href="mailto:secretariat.usb@orange.fr" className="text-club-gold hover:underline">secretariat.usb@orange.fr</a>

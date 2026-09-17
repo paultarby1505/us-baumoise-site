@@ -4,6 +4,7 @@ import type { Match } from "@/lib/types";
 import { siteConfig } from "@/lib/config";
 import { HouseIcon, BusIcon } from "@/components/MatchTypeIcons";
 import { formatParis } from "@/lib/date-fr";
+import ScoreDuel from "@/components/ScoreDuel";
 
 function formatDate(iso: string) {
   return formatParis(iso, {
@@ -53,18 +54,11 @@ function OpposantRow({
   scoreUs: number | null;
   scoreAdverse: number | null;
 }) {
-  const joue = scoreUs !== null && scoreAdverse !== null;
   return (
     <div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
       <EquipeColonne nom={siteConfig.shortName} logos={["/logo.png"]} />
-      <div className="w-16 shrink-0 pt-1 text-center">
-        {joue ? (
-          <span className="font-bold text-club-gold">
-            {scoreUs} - {scoreAdverse}
-          </span>
-        ) : (
-          <span className="text-sm text-foreground/50">vs</span>
-        )}
+      <div className="pt-1">
+        <ScoreDuel scoreGauche={scoreUs} scoreDroite={scoreAdverse} />
       </div>
       <EquipeColonne nom={nom} logos={logos} />
     </div>
@@ -72,7 +66,6 @@ function OpposantRow({
 }
 
 export default function MatchCard({ match }: { match: Match }) {
-  const joue = match.score_us !== null && match.score_adverse !== null;
   const isTriangulaire = Boolean(match.adversaire && match.adversaire2);
   const isTournoi = !match.adversaire;
 
@@ -137,15 +130,11 @@ export default function MatchCard({ match }: { match: Match }) {
       ) : (
         <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
           <EquipeColonne nom={domicileNom} logos={domicileLogos} />
-          <div className="w-16 shrink-0 pt-1 text-center">
-            {joue ? (
-              <span className="font-bold text-club-gold">
-                {match.domicile ? match.score_us : match.score_adverse} -{" "}
-                {match.domicile ? match.score_adverse : match.score_us}
-              </span>
-            ) : (
-              <span className="text-sm text-foreground/50">vs</span>
-            )}
+          <div className="pt-1">
+            <ScoreDuel
+              scoreGauche={match.domicile ? match.score_us : match.score_adverse}
+              scoreDroite={match.domicile ? match.score_adverse : match.score_us}
+            />
           </div>
           <EquipeColonne nom={exterieurNom} logos={exterieurLogos} />
         </div>

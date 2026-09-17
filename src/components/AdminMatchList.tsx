@@ -10,7 +10,7 @@ import type { Match } from "@/lib/types";
 const TOUTES = "Toutes";
 
 function pillClass(active: boolean) {
-  return `rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+  return `rounded-full border-2 border-black px-4 py-1.5 text-sm font-semibold transition-colors ${
     active ? "bg-club-gold text-black" : "bg-black/5 text-foreground/70 hover:bg-black/10"
   }`;
 }

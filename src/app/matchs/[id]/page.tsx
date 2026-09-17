@@ -8,6 +8,7 @@ import { HouseIcon, BusIcon } from "@/components/MatchTypeIcons";
 import CompositionPitch from "@/components/CompositionPitch";
 import MatchTabs from "@/components/MatchTabs";
 import { formatParis } from "@/lib/date-fr";
+import ScoreDuel from "@/components/ScoreDuel";
 
 export const dynamic = "force-dynamic";
 
@@ -58,8 +59,6 @@ export default async function MatchDetailPage({
   const exterieurNom = match.domicile ? match.adversaire : siteConfig.shortName;
   const domicileLogos = match.domicile ? ["/logo.png"] : match.adversaire_logos;
   const exterieurLogos = match.domicile ? match.adversaire_logos : ["/logo.png"];
-  const joue = match.score_us !== null && match.score_adverse !== null;
-  const joue2 = match.score_us2 !== null && match.score_adverse2 !== null;
 
   const infoTab = (
     <div>
@@ -147,14 +146,8 @@ export default async function MatchDetailPage({
                 />
                 {siteConfig.shortName}
               </span>
-              <span>
-                {joue ? (
-                  <span className="text-xl font-extrabold text-club-gold sm:text-2xl">
-                    {match.score_us} - {match.score_adverse}
-                  </span>
-                ) : (
-                  <span className="text-sm text-foreground/50">vs</span>
-                )}
+              <span className="flex justify-center">
+                <ScoreDuel scoreGauche={match.score_us} scoreDroite={match.score_adverse} />
               </span>
               <span className="flex flex-col items-center gap-2 font-semibold">
                 {match.adversaire_logos.length > 0 && (
@@ -185,14 +178,8 @@ export default async function MatchDetailPage({
                 />
                 {siteConfig.shortName}
               </span>
-              <span>
-                {joue2 ? (
-                  <span className="text-xl font-extrabold text-club-gold sm:text-2xl">
-                    {match.score_us2} - {match.score_adverse2}
-                  </span>
-                ) : (
-                  <span className="text-sm text-foreground/50">vs</span>
-                )}
+              <span className="flex justify-center">
+                <ScoreDuel scoreGauche={match.score_us2} scoreDroite={match.score_adverse2} />
               </span>
               <span className="flex flex-col items-center gap-2 font-semibold">
                 {match.adversaire2_logos.length > 0 && (
@@ -232,15 +219,11 @@ export default async function MatchDetailPage({
               )}
               <span className="font-semibold">{domicileNom}</span>
             </div>
-            <div>
-              {joue ? (
-                <span className="text-xl font-extrabold text-club-gold sm:text-2xl">
-                  {match.domicile ? match.score_us : match.score_adverse} -{" "}
-                  {match.domicile ? match.score_adverse : match.score_us}
-                </span>
-              ) : (
-                <span className="text-sm text-foreground/50">vs</span>
-              )}
+            <div className="flex justify-center">
+              <ScoreDuel
+                scoreGauche={match.domicile ? match.score_us : match.score_adverse}
+                scoreDroite={match.domicile ? match.score_adverse : match.score_us}
+              />
             </div>
             <div className="flex flex-col items-center gap-2">
               {exterieurLogos.length > 0 && (

@@ -32,7 +32,7 @@ export default function MatchListByCategorie({
             key={cat}
             type="button"
             onClick={() => setSelected(cat)}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+            className={`rounded-full border-2 border-black px-4 py-1.5 text-sm font-semibold transition-colors ${
               selected === cat
                 ? "bg-club-gold text-black"
                 : "bg-black/5 text-foreground/70 hover:bg-black/10"

@@ -54,6 +54,15 @@ export default async function Footer() {
             </div>
           </div>
         )}
+
+        <div className="mt-8 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/10 pt-4 text-xs text-white/50">
+          <Link href="/mentions-legales" className="hover:text-club-gold-light">
+            Mentions légales
+          </Link>
+          <Link href="/politique-de-confidentialite" className="hover:text-club-gold-light">
+            Politique de confidentialité
+          </Link>
+        </div>
       </div>
     </footer>
   );

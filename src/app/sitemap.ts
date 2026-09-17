@@ -21,6 +21,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteConfig.url}/galerie`, changeFrequency: "weekly", priority: 0.5 },
     { url: `${siteConfig.url}/partenaires`, changeFrequency: "monthly", priority: 0.4 },
     { url: `${siteConfig.url}/contact`, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${siteConfig.url}/mentions-legales`, changeFrequency: "yearly", priority: 0.1 },
+    {
+      url: `${siteConfig.url}/politique-de-confidentialite`,
+      changeFrequency: "yearly",
+      priority: 0.1,
+    },
   ];
 
   const categorieRoutes: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({

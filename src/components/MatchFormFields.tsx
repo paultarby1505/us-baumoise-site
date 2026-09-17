@@ -107,28 +107,28 @@ export default function MatchFormFields({ initial }: { initial?: Partial<MatchFo
       )}
 
       {mode !== "tournoi" && (
-        <>
-          <label className="block text-sm font-medium">
-            {mode === "u14" ? "Adversaire (optionnel)" : "Adversaire"}
-            <input
-              type="text"
-              name="adversaire"
-              defaultValue={values.adversaire}
-              required={mode === "classique"}
-              className="mt-1 w-full rounded border border-black/20 px-3 py-2"
-            />
-          </label>
-          <ImagePickerField
-            name="adversaire_logo"
-            label={
-              values.adversaire_logo_url
-                ? "Remplacer le logo de l'adversaire"
-                : "Logo de l'adversaire (optionnel)"
-            }
-            aspect={1}
+        <label className="block text-sm font-medium">
+          {mode === "u14" ? "Adversaire (optionnel)" : "Adversaire"}
+          <input
+            type="text"
+            name="adversaire"
+            defaultValue={values.adversaire}
+            required={mode === "classique"}
+            className="mt-1 w-full rounded border border-black/20 px-3 py-2"
           />
-        </>
+        </label>
       )}
+      <ImagePickerField
+        name="adversaire_logo"
+        label={
+          mode === "tournoi"
+            ? "Logo / photo du tournoi (optionnel)"
+            : values.adversaire_logo_url
+              ? "Remplacer le logo de l'adversaire"
+              : "Logo de l'adversaire (optionnel)"
+        }
+        aspect={1}
+      />
 
       {mode === "u14" && !showSecondAdversaire && (
         <button

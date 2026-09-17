@@ -75,7 +75,18 @@ export default function MatchCard({ match }: { match: Match }) {
       <p className="mt-1 text-xs text-foreground/50">{formatDate(match.date_match)}</p>
 
       {isTournoi ? (
-        <p className="mt-2 font-semibold">{match.nom_tournoi || "Plateau / tournoi"}</p>
+        <div className="mt-2 flex flex-col items-center gap-2 text-center">
+          {match.adversaire_logo_url && (
+            <Image
+              src={match.adversaire_logo_url}
+              alt={match.nom_tournoi ? `Logo ${match.nom_tournoi}` : "Logo du tournoi"}
+              width={48}
+              height={48}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+          )}
+          <p className="font-semibold">{match.nom_tournoi || "Plateau / tournoi"}</p>
+        </div>
       ) : isTriangulaire ? (
         <div className="mt-2">
           {match.nom_tournoi && (

@@ -111,9 +111,18 @@ export default async function MatchDetailPage({
         <p className="mt-1 text-sm text-foreground/60">{formatDate(match.date_match)}</p>
 
         {isTournoi ? (
-          <p className="mt-6 text-center text-xl font-extrabold">
-            {match.nom_tournoi || "Plateau / tournoi"}
-          </p>
+          <div className="mt-6 flex flex-col items-center gap-3 text-center">
+            {match.adversaire_logo_url && (
+              <Image
+                src={match.adversaire_logo_url}
+                alt={match.nom_tournoi ? `Logo ${match.nom_tournoi}` : "Logo du tournoi"}
+                width={64}
+                height={64}
+                className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+              />
+            )}
+            <p className="text-xl font-extrabold">{match.nom_tournoi || "Plateau / tournoi"}</p>
+          </div>
         ) : isTriangulaire ? (
           <div className="mt-6 space-y-4">
             {match.nom_tournoi && (

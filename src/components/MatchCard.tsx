@@ -89,7 +89,7 @@ export default function MatchCard({ match }: { match: Match }) {
           {match.domicile ? "Domicile" : "Extérieur"}
         </span>
       </div>
-      <p className="mt-1 text-xs text-foreground/50">{formatDate(match.date_match)}</p>
+      <p className="mt-1 text-xs font-semibold text-club-gold">{formatDate(match.date_match)}</p>
 
       {isTournoi ? (
         <div className="mt-2 flex flex-col items-center gap-2 text-center">
@@ -141,7 +141,7 @@ export default function MatchCard({ match }: { match: Match }) {
       )}
 
       {match.lieu && (
-        <p className="mt-2 text-sm text-foreground/60">{match.lieu}</p>
+        <p className="mt-2 text-center text-sm font-semibold text-club-gold">{match.lieu}</p>
       )}
     </Link>
   );

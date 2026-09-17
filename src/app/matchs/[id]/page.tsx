@@ -108,7 +108,7 @@ export default async function MatchDetailPage({
           </span>
         </div>
 
-        <p className="mt-1 text-sm text-foreground/60">{formatDate(match.date_match)}</p>
+        <p className="mt-1 text-sm font-semibold text-club-gold">{formatDate(match.date_match)}</p>
 
         {isTournoi ? (
           <div className="mt-6 flex flex-col items-center gap-3 text-center">
@@ -246,7 +246,7 @@ export default async function MatchDetailPage({
         )}
 
         {match.lieu && (
-          <p className="mt-6 text-center text-sm text-foreground/60">{match.lieu}</p>
+          <p className="mt-6 text-center text-sm font-semibold text-club-gold">{match.lieu}</p>
         )}
       </div>
 

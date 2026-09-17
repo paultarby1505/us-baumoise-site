@@ -23,7 +23,7 @@ export type Joueur = {
 export type Match = {
   id: string;
   adversaire: string | null;
-  adversaire_logo_url: string | null;
+  adversaire_logos: string[];
   domicile: boolean;
   date_match: string;
   lieu: string | null;
@@ -34,7 +34,7 @@ export type Match = {
   score_adverse: number | null;
   nom_tournoi: string | null;
   adversaire2: string | null;
-  adversaire2_logo_url: string | null;
+  adversaire2_logos: string[];
   score_us2: number | null;
   score_adverse2: number | null;
   created_at: string;

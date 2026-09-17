@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MATCH_CATEGORIES } from "@/lib/rugby";
 import ImagePickerField from "@/components/ImagePickerField";
+import LogosField from "@/components/LogosField";
 
 type Mode = "classique" | "tournoi" | "u14";
 
@@ -25,8 +26,8 @@ export type MatchFormInitial = {
   score_adverse: number | "";
   score_us2: number | "";
   score_adverse2: number | "";
-  adversaire_logo_url: string | null;
-  adversaire2_logo_url: string | null;
+  adversaire_logos: string[];
+  adversaire2_logos: string[];
   affiche_url: string | null;
 };
 
@@ -43,8 +44,8 @@ const DEFAULT_INITIAL: MatchFormInitial = {
   score_adverse: "",
   score_us2: "",
   score_adverse2: "",
-  adversaire_logo_url: null,
-  adversaire2_logo_url: null,
+  adversaire_logos: [],
+  adversaire2_logos: [],
   affiche_url: null,
 };
 
@@ -118,16 +119,16 @@ export default function MatchFormFields({ initial }: { initial?: Partial<MatchFo
           />
         </label>
       )}
-      <ImagePickerField
-        name="adversaire_logo"
-        label={
+      <LogosField
+        keepFieldName="adversaire_logos_keep"
+        newFieldName="adversaire_logos_new"
+        label={mode === "tournoi" ? "Logo(s) / photo(s) du tournoi (optionnel)" : "Logo(s) de l'adversaire (optionnel)"}
+        helpText={
           mode === "tournoi"
-            ? "Logo / photo du tournoi (optionnel)"
-            : values.adversaire_logo_url
-              ? "Remplacer le logo de l'adversaire"
-              : "Logo de l'adversaire (optionnel)"
+            ? "Tu peux en sélectionner plusieurs d'un coup."
+            : "Sélectionne plusieurs logos si l'adversaire est une entente entre plusieurs clubs."
         }
-        aspect={1}
+        initialUrls={values.adversaire_logos}
       />
 
       {mode === "u14" && !showSecondAdversaire && (
@@ -161,14 +162,12 @@ export default function MatchFormFields({ initial }: { initial?: Partial<MatchFo
               className="mt-1 w-full rounded border border-black/20 px-3 py-2"
             />
           </label>
-          <ImagePickerField
-            name="adversaire2_logo"
-            label={
-              values.adversaire2_logo_url
-                ? "Remplacer le logo du 2e adversaire"
-                : "Logo du 2e adversaire (optionnel)"
-            }
-            aspect={1}
+          <LogosField
+            keepFieldName="adversaire2_logos_keep"
+            newFieldName="adversaire2_logos_new"
+            label="Logo(s) du 2e adversaire (optionnel)"
+            helpText="Sélectionne plusieurs logos si cet adversaire est une entente entre plusieurs clubs."
+            initialUrls={values.adversaire2_logos}
           />
           <div className="grid grid-cols-2 gap-4">
             <label className="block text-sm font-medium">

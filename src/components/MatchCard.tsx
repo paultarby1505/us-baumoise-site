@@ -15,14 +15,32 @@ function formatDate(iso: string) {
   });
 }
 
+function LogoCluster({ logos, alt }: { logos: string[]; alt: string }) {
+  if (logos.length === 0) return null;
+  return (
+    <span className="flex items-center gap-1">
+      {logos.map((url) => (
+        <Image
+          key={url}
+          src={url}
+          alt={alt}
+          width={24}
+          height={24}
+          className="h-6 w-6 shrink-0 rounded-full object-cover"
+        />
+      ))}
+    </span>
+  );
+}
+
 function OpposantRow({
   nom,
-  logo,
+  logos,
   scoreUs,
   scoreAdverse,
 }: {
   nom: string;
-  logo: string | null;
+  logos: string[];
   scoreUs: number | null;
   scoreAdverse: number | null;
 }) {
@@ -38,15 +56,7 @@ function OpposantRow({
         <span className="text-sm text-foreground/50">vs</span>
       )}
       <span className="flex items-center gap-2 font-semibold">
-        {logo && (
-          <Image
-            src={logo}
-            alt={`Logo ${nom}`}
-            width={24}
-            height={24}
-            className="h-6 w-6 shrink-0 rounded-full object-cover"
-          />
-        )}
+        <LogoCluster logos={logos} alt={`Logo ${nom}`} />
         {nom}
       </span>
     </div>
@@ -77,14 +87,19 @@ export default function MatchCard({ match }: { match: Match }) {
 
       {isTournoi ? (
         <div className="mt-2 flex flex-col items-center gap-2 text-center">
-          {match.adversaire_logo_url && (
-            <Image
-              src={match.adversaire_logo_url}
-              alt={match.nom_tournoi ? `Logo ${match.nom_tournoi}` : "Logo du tournoi"}
-              width={48}
-              height={48}
-              className="h-12 w-12 rounded-full object-cover"
-            />
+          {match.adversaire_logos.length > 0 && (
+            <span className="flex items-center gap-1">
+              {match.adversaire_logos.map((url) => (
+                <Image
+                  key={url}
+                  src={url}
+                  alt={match.nom_tournoi ? `Logo ${match.nom_tournoi}` : "Logo du tournoi"}
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+              ))}
+            </span>
           )}
           <p className="font-semibold">{match.nom_tournoi || "Plateau / tournoi"}</p>
         </div>
@@ -95,13 +110,13 @@ export default function MatchCard({ match }: { match: Match }) {
           )}
           <OpposantRow
             nom={match.adversaire!}
-            logo={match.adversaire_logo_url}
+            logos={match.adversaire_logos}
             scoreUs={match.score_us}
             scoreAdverse={match.score_adverse}
           />
           <OpposantRow
             nom={match.adversaire2!}
-            logo={match.adversaire2_logo_url}
+            logos={match.adversaire2_logos}
             scoreUs={match.score_us2}
             scoreAdverse={match.score_adverse2}
           />
@@ -109,14 +124,8 @@ export default function MatchCard({ match }: { match: Match }) {
       ) : (
         <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
           <span className="flex items-center gap-2 font-semibold">
-            {!match.domicile && match.adversaire_logo_url && (
-              <Image
-                src={match.adversaire_logo_url}
-                alt={`Logo ${match.adversaire}`}
-                width={24}
-                height={24}
-                className="h-6 w-6 shrink-0 rounded-full object-cover"
-              />
+            {!match.domicile && (
+              <LogoCluster logos={match.adversaire_logos} alt={`Logo ${match.adversaire}`} />
             )}
             {match.domicile ? siteConfig.shortName : match.adversaire}
           </span>
@@ -130,14 +139,8 @@ export default function MatchCard({ match }: { match: Match }) {
           )}
           <span className="flex items-center gap-2 font-semibold">
             {match.domicile ? match.adversaire : siteConfig.shortName}
-            {match.domicile && match.adversaire_logo_url && (
-              <Image
-                src={match.adversaire_logo_url}
-                alt={`Logo ${match.adversaire}`}
-                width={24}
-                height={24}
-                className="h-6 w-6 shrink-0 rounded-full object-cover"
-              />
+            {match.domicile && (
+              <LogoCluster logos={match.adversaire_logos} alt={`Logo ${match.adversaire}`} />
             )}
           </span>
         </div>

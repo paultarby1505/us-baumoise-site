@@ -56,8 +56,8 @@ export default async function MatchDetailPage({
 
   const domicileNom = match.domicile ? siteConfig.shortName : match.adversaire;
   const exterieurNom = match.domicile ? match.adversaire : siteConfig.shortName;
-  const domicileLogo = match.domicile ? "/logo.png" : match.adversaire_logo_url;
-  const exterieurLogo = match.domicile ? match.adversaire_logo_url : "/logo.png";
+  const domicileLogos = match.domicile ? ["/logo.png"] : match.adversaire_logos;
+  const exterieurLogos = match.domicile ? match.adversaire_logos : ["/logo.png"];
   const joue = match.score_us !== null && match.score_adverse !== null;
   const joue2 = match.score_us2 !== null && match.score_adverse2 !== null;
 
@@ -113,14 +113,19 @@ export default async function MatchDetailPage({
 
         {isTournoi ? (
           <div className="mt-6 flex flex-col items-center gap-3 text-center">
-            {match.adversaire_logo_url && (
-              <Image
-                src={match.adversaire_logo_url}
-                alt={match.nom_tournoi ? `Logo ${match.nom_tournoi}` : "Logo du tournoi"}
-                width={64}
-                height={64}
-                className="h-14 w-14 object-contain sm:h-16 sm:w-16"
-              />
+            {match.adversaire_logos.length > 0 && (
+              <div className="flex items-center gap-2">
+                {match.adversaire_logos.map((url) => (
+                  <Image
+                    key={url}
+                    src={url}
+                    alt={match.nom_tournoi ? `Logo ${match.nom_tournoi}` : "Logo du tournoi"}
+                    width={64}
+                    height={64}
+                    className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+                  />
+                ))}
+              </div>
             )}
             <p className="text-xl font-extrabold">{match.nom_tournoi || "Plateau / tournoi"}</p>
           </div>
@@ -143,14 +148,19 @@ export default async function MatchDetailPage({
                 )}
               </span>
               <span className="flex flex-col items-center gap-2 font-semibold">
-                {match.adversaire_logo_url && (
-                  <Image
-                    src={match.adversaire_logo_url}
-                    alt={`Logo ${match.adversaire}`}
-                    width={64}
-                    height={64}
-                    className="h-12 w-12 object-contain sm:h-16 sm:w-16"
-                  />
+                {match.adversaire_logos.length > 0 && (
+                  <span className="flex items-center gap-1">
+                    {match.adversaire_logos.map((url) => (
+                      <Image
+                        key={url}
+                        src={url}
+                        alt={`Logo ${match.adversaire}`}
+                        width={64}
+                        height={64}
+                        className="h-12 w-12 object-contain sm:h-16 sm:w-16"
+                      />
+                    ))}
+                  </span>
                 )}
                 {match.adversaire}
               </span>
@@ -167,14 +177,19 @@ export default async function MatchDetailPage({
                 )}
               </span>
               <span className="flex flex-col items-center gap-2 font-semibold">
-                {match.adversaire2_logo_url && (
-                  <Image
-                    src={match.adversaire2_logo_url}
-                    alt={`Logo ${match.adversaire2}`}
-                    width={64}
-                    height={64}
-                    className="h-12 w-12 object-contain sm:h-16 sm:w-16"
-                  />
+                {match.adversaire2_logos.length > 0 && (
+                  <span className="flex items-center gap-1">
+                    {match.adversaire2_logos.map((url) => (
+                      <Image
+                        key={url}
+                        src={url}
+                        alt={`Logo ${match.adversaire2}`}
+                        width={64}
+                        height={64}
+                        className="h-12 w-12 object-contain sm:h-16 sm:w-16"
+                      />
+                    ))}
+                  </span>
                 )}
                 {match.adversaire2}
               </span>
@@ -183,14 +198,19 @@ export default async function MatchDetailPage({
         ) : (
           <div className="mt-6 grid grid-cols-3 items-center gap-2 text-center sm:gap-4">
             <div className="flex flex-col items-center gap-2">
-              {domicileLogo && (
-                <Image
-                  src={domicileLogo}
-                  alt={`Logo ${domicileNom}`}
-                  width={64}
-                  height={64}
-                  className="h-12 w-12 object-contain sm:h-16 sm:w-16"
-                />
+              {domicileLogos.length > 0 && (
+                <span className="flex items-center gap-1">
+                  {domicileLogos.map((url) => (
+                    <Image
+                      key={url}
+                      src={url}
+                      alt={`Logo ${domicileNom}`}
+                      width={64}
+                      height={64}
+                      className="h-12 w-12 object-contain sm:h-16 sm:w-16"
+                    />
+                  ))}
+                </span>
               )}
               <span className="font-semibold">{domicileNom}</span>
             </div>
@@ -205,14 +225,19 @@ export default async function MatchDetailPage({
               )}
             </div>
             <div className="flex flex-col items-center gap-2">
-              {exterieurLogo && (
-                <Image
-                  src={exterieurLogo}
-                  alt={`Logo ${exterieurNom}`}
-                  width={64}
-                  height={64}
-                  className="h-12 w-12 object-contain sm:h-16 sm:w-16"
-                />
+              {exterieurLogos.length > 0 && (
+                <span className="flex items-center gap-1">
+                  {exterieurLogos.map((url) => (
+                    <Image
+                      key={url}
+                      src={url}
+                      alt={`Logo ${exterieurNom}`}
+                      width={64}
+                      height={64}
+                      className="h-12 w-12 object-contain sm:h-16 sm:w-16"
+                    />
+                  ))}
+                </span>
               )}
               <span className="font-semibold">{exterieurNom}</span>
             </div>

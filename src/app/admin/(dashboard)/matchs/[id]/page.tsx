@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getJoueurs, getMatchComposition } from "@/lib/queries";
@@ -51,21 +50,6 @@ export default async function EditMatchPage({
         </p>
       )}
 
-      {(match.adversaire_logo_url || match.adversaire2_logo_url) && (
-        <div className="mt-4 flex gap-4">
-          {match.adversaire_logo_url && (
-            <div className="relative h-16 w-16 overflow-hidden rounded-full border border-black/10">
-              <Image src={match.adversaire_logo_url} alt="" fill className="object-cover" sizes="64px" />
-            </div>
-          )}
-          {match.adversaire2_logo_url && (
-            <div className="relative h-16 w-16 overflow-hidden rounded-full border border-black/10">
-              <Image src={match.adversaire2_logo_url} alt="" fill className="object-cover" sizes="64px" />
-            </div>
-          )}
-        </div>
-      )}
-
       <form action={updateMatch.bind(null, id)} className="mt-6 max-w-md space-y-4">
         <MatchFormFields
           initial={{
@@ -81,8 +65,8 @@ export default async function EditMatchPage({
             score_adverse: match.score_adverse ?? "",
             score_us2: match.score_us2 ?? "",
             score_adverse2: match.score_adverse2 ?? "",
-            adversaire_logo_url: match.adversaire_logo_url,
-            adversaire2_logo_url: match.adversaire2_logo_url,
+            adversaire_logos: match.adversaire_logos,
+            adversaire2_logos: match.adversaire2_logos,
             affiche_url: match.affiche_url,
           }}
         />

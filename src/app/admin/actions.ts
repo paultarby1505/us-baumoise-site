@@ -31,6 +31,31 @@ async function uploadImageIfProvided(
   return `${data.publicUrl}?v=${Date.now()}`;
 }
 
+async function uploadMultipleImages(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  formData: FormData,
+  fieldName: string,
+  bucket: string,
+  basePathPrefix: string
+): Promise<string[]> {
+  const files = formData
+    .getAll(fieldName)
+    .filter((f): f is File => f instanceof File && f.size > 0);
+
+  const urls: string[] = [];
+  for (const file of files) {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `${basePathPrefix}-${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage
+      .from(bucket)
+      .upload(path, file, { contentType: file.type });
+    if (error) throw error;
+    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+    urls.push(data.publicUrl);
+  }
+  return urls;
+}
+
 async function removeStoredImages(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
   bucket: string,
@@ -386,21 +411,21 @@ export async function createMatch(formData: FormData) {
   }
   const id = crypto.randomUUID();
 
-  let logoUrl: string | undefined;
-  let logo2Url: string | undefined;
+  let logoUrls: string[] = [];
+  let logo2Urls: string[] = [];
   let afficheUrl: string | undefined;
   try {
-    logoUrl = await uploadImageIfProvided(
+    logoUrls = await uploadMultipleImages(
       supabase,
       formData,
-      "adversaire_logo",
+      "adversaire_logos_new",
       "matchs-photos",
       `${id}-logo`
     );
-    logo2Url = await uploadImageIfProvided(
+    logo2Urls = await uploadMultipleImages(
       supabase,
       formData,
-      "adversaire2_logo",
+      "adversaire2_logos_new",
       "matchs-photos",
       `${id}-logo2`
     );
@@ -424,7 +449,7 @@ export async function createMatch(formData: FormData) {
   const { error } = await supabase.from("matchs").insert({
     id,
     adversaire: strOrNull(formData, "adversaire"),
-    adversaire_logo_url: logoUrl ?? null,
+    adversaire_logos: logoUrls,
     domicile: formData.get("domicile") === "on",
     date_match: dateMatch,
     lieu: strOrNull(formData, "lieu"),
@@ -435,7 +460,7 @@ export async function createMatch(formData: FormData) {
     score_adverse: intOrNull(formData, "score_adverse"),
     nom_tournoi: strOrNull(formData, "nom_tournoi"),
     adversaire2,
-    adversaire2_logo_url: adversaire2 ? logo2Url ?? null : null,
+    adversaire2_logos: adversaire2 ? logo2Urls : [],
     score_us2: intOrNull(formData, "score_us2"),
     score_adverse2: intOrNull(formData, "score_adverse2"),
   });
@@ -450,21 +475,21 @@ export async function updateMatch(id: string, formData: FormData) {
     redirect(`/admin/matchs/${id}?error=${encodeURIComponent("Date de match invalide")}`);
   }
 
-  let logoUrl: string | undefined;
-  let logo2Url: string | undefined;
+  let newLogoUrls: string[] = [];
+  let newLogo2Urls: string[] = [];
   let afficheUrl: string | undefined;
   try {
-    logoUrl = await uploadImageIfProvided(
+    newLogoUrls = await uploadMultipleImages(
       supabase,
       formData,
-      "adversaire_logo",
+      "adversaire_logos_new",
       "matchs-photos",
       `${id}-logo`
     );
-    logo2Url = await uploadImageIfProvided(
+    newLogo2Urls = await uploadMultipleImages(
       supabase,
       formData,
-      "adversaire2_logo",
+      "adversaire2_logos_new",
       "matchs-photos",
       `${id}-logo2`
     );
@@ -484,9 +509,12 @@ export async function updateMatch(id: string, formData: FormData) {
   }
 
   const adversaire2 = strOrNull(formData, "adversaire2");
+  const keptLogos = formData.getAll("adversaire_logos_keep").map(String);
+  const keptLogos2 = formData.getAll("adversaire2_logos_keep").map(String);
 
   const updateData: Record<string, unknown> = {
     adversaire: strOrNull(formData, "adversaire"),
+    adversaire_logos: [...keptLogos, ...newLogoUrls],
     domicile: formData.get("domicile") === "on",
     date_match: dateMatch,
     lieu: strOrNull(formData, "lieu"),
@@ -496,16 +524,11 @@ export async function updateMatch(id: string, formData: FormData) {
     score_adverse: intOrNull(formData, "score_adverse"),
     nom_tournoi: strOrNull(formData, "nom_tournoi"),
     adversaire2,
+    adversaire2_logos: adversaire2 ? [...keptLogos2, ...newLogo2Urls] : [],
     score_us2: intOrNull(formData, "score_us2"),
     score_adverse2: intOrNull(formData, "score_adverse2"),
   };
-  if (logoUrl) updateData.adversaire_logo_url = logoUrl;
   if (afficheUrl) updateData.affiche_url = afficheUrl;
-  if (!adversaire2) {
-    updateData.adversaire2_logo_url = null;
-  } else if (logo2Url) {
-    updateData.adversaire2_logo_url = logo2Url;
-  }
 
   const { error } = await supabase.from("matchs").update(updateData).eq("id", id);
   if (error) redirect(`/admin/matchs/${id}?error=${encodeURIComponent(error.message)}`);

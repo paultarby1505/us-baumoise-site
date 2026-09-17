@@ -137,7 +137,16 @@ export default async function MatchDetailPage({
               </p>
             )}
             <div className="grid grid-cols-3 items-center gap-2 text-center sm:gap-4">
-              <span className="font-semibold">{siteConfig.shortName}</span>
+              <span className="flex flex-col items-center gap-2 font-semibold">
+                <Image
+                  src="/logo.png"
+                  alt={`Logo ${siteConfig.shortName}`}
+                  width={64}
+                  height={64}
+                  className="h-12 w-12 object-contain sm:h-16 sm:w-16"
+                />
+                {siteConfig.shortName}
+              </span>
               <span>
                 {joue ? (
                   <span className="text-xl font-extrabold text-club-gold sm:text-2xl">
@@ -166,7 +175,16 @@ export default async function MatchDetailPage({
               </span>
             </div>
             <div className="grid grid-cols-3 items-center gap-2 text-center sm:gap-4">
-              <span className="font-semibold">{siteConfig.shortName}</span>
+              <span className="flex flex-col items-center gap-2 font-semibold">
+                <Image
+                  src="/logo.png"
+                  alt={`Logo ${siteConfig.shortName}`}
+                  width={64}
+                  height={64}
+                  className="h-12 w-12 object-contain sm:h-16 sm:w-16"
+                />
+                {siteConfig.shortName}
+              </span>
               <span>
                 {joue2 ? (
                   <span className="text-xl font-extrabold text-club-gold sm:text-2xl">

@@ -56,7 +56,7 @@ function OpposantRow({
   const joue = scoreUs !== null && scoreAdverse !== null;
   return (
     <div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
-      <div className="pt-1 text-center font-semibold">{siteConfig.shortName}</div>
+      <EquipeColonne nom={siteConfig.shortName} logos={["/logo.png"]} />
       <div className="w-16 shrink-0 pt-1 text-center">
         {joue ? (
           <span className="font-bold text-club-gold">
@@ -78,8 +78,8 @@ export default function MatchCard({ match }: { match: Match }) {
 
   const domicileNom = match.domicile ? siteConfig.shortName : match.adversaire!;
   const exterieurNom = match.domicile ? match.adversaire! : siteConfig.shortName;
-  const domicileLogos = match.domicile ? [] : match.adversaire_logos;
-  const exterieurLogos = match.domicile ? match.adversaire_logos : [];
+  const domicileLogos = match.domicile ? ["/logo.png"] : match.adversaire_logos;
+  const exterieurLogos = match.domicile ? match.adversaire_logos : ["/logo.png"];
 
   return (
     <Link

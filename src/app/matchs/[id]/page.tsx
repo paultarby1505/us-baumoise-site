@@ -105,7 +105,7 @@ export default async function MatchDetailPage({
           <span className="whitespace-nowrap text-center text-sm">
             {formatDate(match.date_match)}
           </span>
-          <span className="flex items-center justify-end gap-1 normal-case text-foreground/60">
+          <span className="flex items-center justify-end gap-1 normal-case text-club-gold">
             {match.domicile ? <HouseIcon /> : <BusIcon />}
             {match.domicile ? "Domicile" : "Extérieur"}
           </span>

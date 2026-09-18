@@ -45,6 +45,13 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: siteConfig.shortName,
   },
+  // `appleWebApp.capable` ne génère que la balise générique
+  // "mobile-web-app-capable" : Safari iOS l'ignore et garde sa barre de
+  // navigation. Seule la balise historique "apple-mobile-web-app-capable"
+  // fait passer l'appli en plein écran une fois ajoutée à l'écran d'accueil.
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {

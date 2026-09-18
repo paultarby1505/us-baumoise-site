@@ -112,7 +112,9 @@ export default async function EditJoueurPage({
         <ImagePickerField
           name="photo"
           label={joueur.photo_url ? "Remplacer la photo" : "Photo (optionnelle)"}
+          helpText="La photo est recadrée automatiquement au même format que les autres."
           aspect={3 / 4}
+          autoCrop
         />
         <button
           type="submit"

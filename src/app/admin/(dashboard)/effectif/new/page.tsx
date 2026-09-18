@@ -80,8 +80,9 @@ export default async function NewJoueurPage({
         <ImagePickerField
           name="photo"
           label="Photo (optionnelle)"
-          helpText="Si aucune photo n'est fournie, une silhouette par défaut sera affichée."
+          helpText="Si aucune photo n'est fournie, une silhouette par défaut sera affichée. La photo est recadrée automatiquement au même format que les autres."
           aspect={3 / 4}
+          autoCrop
         />
         <button
           type="submit"

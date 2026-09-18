@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { compressImage } from "@/lib/image-compress";
+import { getCenterCroppedBlob } from "@/lib/crop-image";
 import ImageCropperModal from "@/components/ImageCropperModal";
 
 function extForMimeType(type: string): string {
@@ -14,12 +15,14 @@ export default function ImagePickerField({
   required,
   helpText,
   aspect,
+  autoCrop,
 }: {
   name: string;
   label: string;
   required?: boolean;
   helpText?: string;
   aspect?: number;
+  autoCrop?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "compressing" | "error">("idle");
@@ -28,11 +31,22 @@ export default function ImagePickerField({
   const [cropType, setCropType] = useState<string | undefined>(undefined);
   const pendingFile = useRef<File | null>(null);
 
-  function handlePick() {
+  async function handlePick() {
     const input = inputRef.current;
     const file = input?.files?.[0];
     if (!input || !file) return;
     pendingFile.current = file;
+
+    if (autoCrop && aspect) {
+      try {
+        const blob = await getCenterCroppedBlob(file, aspect, file.type);
+        await applyCroppedFile(blob);
+      } catch {
+        setStatus("error");
+      }
+      return;
+    }
+
     setCropType(file.type);
     setCropSrc(URL.createObjectURL(file));
   }
@@ -100,13 +114,15 @@ export default function ImagePickerField({
           <span className="mt-2 flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={previewUrl} alt="" className="h-16 w-16 rounded object-cover" />
-            <button
-              type="button"
-              onClick={reopenCrop}
-              className="text-xs font-semibold text-club-gold hover:underline"
-            >
-              Recadrer à nouveau
-            </button>
+            {!autoCrop && (
+              <button
+                type="button"
+                onClick={reopenCrop}
+                className="text-xs font-semibold text-club-gold hover:underline"
+              >
+                Recadrer à nouveau
+              </button>
+            )}
           </span>
         )}
         {status === "idle" && !previewUrl && helpText && (

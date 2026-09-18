@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { deleteJoueur } from "@/app/admin/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
-import { categoryRank } from "@/lib/rugby";
+import { categoryRank, posteRank } from "@/lib/rugby";
 import type { Joueur } from "@/lib/types";
 
 export default async function AdminEffectifPage() {
@@ -12,9 +12,13 @@ export default async function AdminEffectifPage() {
     .from("joueurs")
     .select("*")
     .order("numero", { ascending: true });
-  const joueurs = ((data ?? []) as Joueur[]).sort(
-    (a, b) => categoryRank(a.categorie) - categoryRank(b.categorie)
-  );
+  const joueurs = ((data ?? []) as Joueur[]).sort((a, b) => {
+    const categorie = categoryRank(a.categorie) - categoryRank(b.categorie);
+    if (categorie !== 0) return categorie;
+    const poste = posteRank(a.poste) - posteRank(b.poste);
+    if (poste !== 0) return poste;
+    return (a.numero ?? Infinity) - (b.numero ?? Infinity);
+  });
 
   return (
     <div>

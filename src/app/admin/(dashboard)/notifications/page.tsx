@@ -41,9 +41,12 @@ export default async function NotificationsPage({
               name="titre"
               required
               maxLength={60}
-              defaultValue="US Baumoise Rugby"
+              placeholder="Ex. Entraînement annulé"
               className="mt-1 w-full rounded border border-black/20 px-3 py-2"
             />
+            <span className="mt-1 block text-xs font-normal text-foreground/50">
+              Inutile de remettre le nom du club, le téléphone l&apos;affiche déjà tout seul.
+            </span>
           </label>
           <label className="block text-sm font-medium">
             Message

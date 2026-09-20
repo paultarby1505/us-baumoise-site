@@ -98,7 +98,7 @@ export async function sendAutoNotification(
   if (!active || !template) return;
 
   await sendPushToAll({
-    title: "US Baumoise Rugby",
+    title: kind === "actualite" ? "Nouvelle actualité" : "Résultat du match",
     body: renderTemplate(template, vars),
   });
 }

@@ -61,6 +61,14 @@ export const POSTE_SLOTS: { slot: number; label: string }[] = [
   { slot: 13, label: "Centre" },
   { slot: 14, label: "Ailier" },
   { slot: 15, label: "Arrière" },
+  { slot: 16, label: "Remplaçant" },
+  { slot: 17, label: "Remplaçant" },
+  { slot: 18, label: "Remplaçant" },
+  { slot: 19, label: "Remplaçant" },
+  { slot: 20, label: "Remplaçant" },
+  { slot: 21, label: "Remplaçant" },
+  { slot: 22, label: "Remplaçant" },
+  { slot: 23, label: "Remplaçant" },
 ];
 
 export function slotLabel(slot: number): string {
@@ -77,6 +85,12 @@ export const COMPOSITION_ROWS: number[][] = [
   [9, 10],
   [11, 12, 13, 14],
   [15],
+];
+
+// Les 8 places de remplaçants (16 à 23), affichées à part du XV de départ.
+export const REMPLACANTS_ROWS: number[][] = [
+  [16, 17, 18, 19],
+  [20, 21, 22, 23],
 ];
 
 // Catégories utilisées pour les matchs : les jeunes catégories (Baby à

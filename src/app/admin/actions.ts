@@ -558,7 +558,7 @@ export async function updateMatchComposition(matchId: string, formData: FormData
       e &&
       Number.isInteger(e.slot) &&
       e.slot >= 1 &&
-      e.slot <= 15 &&
+      e.slot <= 23 &&
       typeof e.joueur_id === "string" &&
       e.joueur_id.length > 0
   );

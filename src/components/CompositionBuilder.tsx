@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useMemo, useState, useTransition } from "react";
 import { updateMatchComposition } from "@/app/admin/actions";
-import { COMPOSITION_ROWS, slotLabel } from "@/lib/rugby";
+import { COMPOSITION_ROWS, REMPLACANTS_ROWS, slotLabel } from "@/lib/rugby";
 import type { Joueur } from "@/lib/types";
 
 function SilhouetteIcon() {
@@ -41,7 +41,7 @@ export default function CompositionBuilder({
 }) {
   const [slots, setSlots] = useState<Record<number, string | null>>(() => {
     const base: Record<number, string | null> = {};
-    for (let s = 1; s <= 15; s++) base[s] = null;
+    for (let s = 1; s <= 23; s++) base[s] = null;
     for (const entry of initial) base[entry.slot] = entry.joueur_id;
     return base;
   });
@@ -112,10 +112,50 @@ export default function CompositionBuilder({
   function handleClear() {
     setSlots(() => {
       const base: Record<number, string | null> = {};
-      for (let s = 1; s <= 15; s++) base[s] = null;
+      for (let s = 1; s <= 23; s++) base[s] = null;
       return base;
     });
     setSelected(null);
+  }
+
+  function renderSlot(slot: number) {
+    const joueur = slots[slot] ? joueursById.get(slots[slot]!) : undefined;
+    return (
+      <button
+        key={slot}
+        type="button"
+        onClick={() => clickSlot(slot)}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          const id = e.dataTransfer.getData("text/plain");
+          if (id) assign(id, slot);
+        }}
+        draggable={Boolean(joueur)}
+        onDragStart={(e) => {
+          if (joueur) e.dataTransfer.setData("text/plain", joueur.id);
+        }}
+        className={`flex w-20 flex-col items-center gap-1 rounded-lg border p-2 text-center transition-colors sm:w-24 ${
+          joueur
+            ? "border-club-gold bg-club-black-soft"
+            : "border-dashed border-white/20 hover:border-club-gold/60"
+        }`}
+      >
+        {joueur ? (
+          <PlayerAvatar joueur={joueur} />
+        ) : (
+          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-dashed border-white/20 text-xs text-white/40">
+            {slot}
+          </div>
+        )}
+        <p className="w-full truncate text-[11px] font-semibold text-white">
+          {joueur ? `${joueur.prenom} ${joueur.nom}` : slotLabel(slot)}
+        </p>
+        <p className="text-[10px] text-white/40">
+          {slot}. {slotLabel(slot)}
+        </p>
+      </button>
+    );
   }
 
   function handleSave() {
@@ -142,45 +182,21 @@ export default function CompositionBuilder({
       >
         {COMPOSITION_ROWS.map((row, i) => (
           <div key={i} className="flex flex-wrap justify-center gap-2 sm:gap-3">
-            {row.map((slot) => {
-              const joueur = slots[slot] ? joueursById.get(slots[slot]!) : undefined;
-              return (
-                <button
-                  key={slot}
-                  type="button"
-                  onClick={() => clickSlot(slot)}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const id = e.dataTransfer.getData("text/plain");
-                    if (id) assign(id, slot);
-                  }}
-                  draggable={Boolean(joueur)}
-                  onDragStart={(e) => {
-                    if (joueur) e.dataTransfer.setData("text/plain", joueur.id);
-                  }}
-                  className={`flex w-20 flex-col items-center gap-1 rounded-lg border p-2 text-center transition-colors sm:w-24 ${
-                    joueur
-                      ? "border-club-gold bg-club-black-soft"
-                      : "border-dashed border-white/20 hover:border-club-gold/60"
-                  }`}
-                >
-                  {joueur ? (
-                    <PlayerAvatar joueur={joueur} />
-                  ) : (
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full border border-dashed border-white/20 text-xs text-white/40">
-                      {slot}
-                    </div>
-                  )}
-                  <p className="w-full truncate text-[11px] font-semibold text-white">
-                    {joueur ? `${joueur.prenom} ${joueur.nom}` : slotLabel(slot)}
-                  </p>
-                  <p className="text-[10px] text-white/40">
-                    {slot}. {slotLabel(slot)}
-                  </p>
-                </button>
-              );
-            })}
+            {row.map((slot) => renderSlot(slot))}
+          </div>
+        ))}
+      </div>
+
+      <div
+        className="mt-4 space-y-3 rounded-lg bg-club-black-soft p-4 sm:p-6"
+        onDragOver={(e) => e.preventDefault()}
+      >
+        <p className="text-center text-xs font-semibold uppercase tracking-wide text-white/50">
+          Remplaçants
+        </p>
+        {REMPLACANTS_ROWS.map((row, i) => (
+          <div key={i} className="flex flex-wrap justify-center gap-2 sm:gap-3">
+            {row.map((slot) => renderSlot(slot))}
           </div>
         ))}
       </div>

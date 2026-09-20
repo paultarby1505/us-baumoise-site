@@ -127,21 +127,28 @@ function NotificationButton() {
       }
 
       const permission = await Notification.requestPermission();
-      if (permission !== "granted") return;
+      if (permission !== "granted") {
+        alert("Autorisation refusée : impossible d'activer les notifications.");
+        return;
+      }
 
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       });
       const json = sub.toJSON();
-      if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) return;
-      await subscribePush({
+      if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) {
+        throw new Error("Abonnement incomplet (endpoint ou clés manquantes)");
+      }
+      const { ok } = await subscribePush({
         endpoint: json.endpoint,
         keys: { p256dh: json.keys.p256dh, auth: json.keys.auth },
       });
+      if (!ok) throw new Error("Échec de l'enregistrement de l'abonnement côté serveur");
       setSubscribed(true);
     } catch (err) {
       console.error("Échec de l'abonnement aux notifications", err);
+      alert("L'activation des notifications a échoué. Réessaie dans un instant.");
     } finally {
       setBusy(false);
     }

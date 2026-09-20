@@ -50,7 +50,9 @@ type PushSubscriptionInput = {
   keys: { p256dh: string; auth: string };
 };
 
-export async function subscribePush(sub: PushSubscriptionInput): Promise<{ ok: boolean }> {
+export async function subscribePush(
+  sub: PushSubscriptionInput
+): Promise<{ ok: boolean; error?: string }> {
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.from("push_subscriptions").upsert(
     {
@@ -60,7 +62,8 @@ export async function subscribePush(sub: PushSubscriptionInput): Promise<{ ok: b
     },
     { onConflict: "endpoint" }
   );
-  return { ok: !error };
+  if (error) console.error("Échec de l'enregistrement de l'abonnement push", error);
+  return { ok: !error, error: error?.message };
 }
 
 export async function unsubscribePush(endpoint: string): Promise<{ ok: boolean }> {

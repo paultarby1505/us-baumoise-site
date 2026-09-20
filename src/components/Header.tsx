@@ -154,7 +154,8 @@ function NotificationButton() {
       setSubscribed(true);
     } catch (err) {
       console.error("Échec de l'abonnement aux notifications", err);
-      alert("L'activation des notifications a échoué. Réessaie dans un instant.");
+      const detail = err instanceof Error ? `${err.name} : ${err.message}` : String(err);
+      alert(`L'activation des notifications a échoué.\n\n${detail}`);
     } finally {
       setBusy(false);
     }

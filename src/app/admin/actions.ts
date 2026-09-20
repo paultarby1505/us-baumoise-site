@@ -8,6 +8,7 @@ import { slugify } from "@/lib/slugify";
 import { CATEGORIES, MATCH_CATEGORIES, categorySlug } from "@/lib/rugby";
 import { str, strOrNull, intOrNull } from "@/lib/form-data";
 import { parisInputToUtcIso } from "@/lib/date-fr";
+import { sendAutoNotification, sendPushToAll } from "@/lib/push-server";
 
 async function uploadImageIfProvided(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
@@ -254,6 +255,13 @@ export async function createActualite(formData: FormData) {
     );
   }
 
+  // Une notification ratée ne doit jamais empêcher la publication de l'actu.
+  try {
+    await sendAutoNotification("actualite", { titre });
+  } catch (e) {
+    console.error("Échec de la notification automatique (nouvelle actualité)", e);
+  }
+
   redirect("/admin/actualites");
 }
 
@@ -475,6 +483,14 @@ export async function updateMatch(id: string, formData: FormData) {
     redirect(`/admin/matchs/${id}?error=${encodeURIComponent("Date de match invalide")}`);
   }
 
+  // Pour ne notifier qu'à la toute première saisie du résultat, pas à
+  // chaque correction ultérieure.
+  const { data: matchAvant } = await supabase
+    .from("matchs")
+    .select("score_us, score_adverse")
+    .eq("id", id)
+    .maybeSingle();
+
   let newLogoUrls: string[] = [];
   let newLogo2Urls: string[] = [];
   let afficheUrl: string | undefined;
@@ -532,6 +548,24 @@ export async function updateMatch(id: string, formData: FormData) {
 
   const { error } = await supabase.from("matchs").update(updateData).eq("id", id);
   if (error) redirect(`/admin/matchs/${id}?error=${encodeURIComponent(error.message)}`);
+
+  const resultatVientDetreSaisi =
+    matchAvant?.score_us == null &&
+    matchAvant?.score_adverse == null &&
+    updateData.score_us != null &&
+    updateData.score_adverse != null;
+  if (resultatVientDetreSaisi) {
+    try {
+      await sendAutoNotification("resultat", {
+        adversaire: (updateData.adversaire as string | null) || "l'adversaire",
+        score_us: String(updateData.score_us),
+        score_adverse: String(updateData.score_adverse),
+      });
+    } catch (e) {
+      console.error("Échec de la notification automatique (résultat de match)", e);
+    }
+  }
+
   redirect("/admin/matchs");
 }
 
@@ -815,4 +849,33 @@ export async function deleteContact(id: string) {
   const supabase = await createServerSupabaseClient();
   await supabase.from("contacts").delete().eq("id", id);
   redirect("/admin/contacts");
+}
+
+// --- Notifications push ---
+
+export async function sendManualNotification(formData: FormData) {
+  const titre = str(formData, "titre");
+  const message = str(formData, "message");
+  if (!titre || !message) {
+    redirect(`/admin/notifications?error=${encodeURIComponent("Titre et message sont obligatoires.")}`);
+  }
+
+  const { sent } = await sendPushToAll({ title: titre, body: message });
+  redirect(`/admin/notifications?success=${encodeURIComponent(`Notification envoyée à ${sent} abonné(s).`)}`);
+}
+
+export async function updateNotificationSettings(formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase
+    .from("site_settings")
+    .update({
+      notif_actualite_active: formData.get("notif_actualite_active") === "on",
+      notif_actualite_texte: str(formData, "notif_actualite_texte"),
+      notif_resultat_active: formData.get("notif_resultat_active") === "on",
+      notif_resultat_texte: str(formData, "notif_resultat_texte"),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", 1);
+  if (error) redirect(`/admin/notifications?error=${encodeURIComponent(error.message)}`);
+  redirect("/admin/notifications?success=Réglages enregistrés.");
 }

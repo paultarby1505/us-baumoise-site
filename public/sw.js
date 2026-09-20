@@ -93,3 +93,39 @@ async function networkFirst(request) {
     throw error;
   }
 }
+
+// --- Notifications push (actus, résultats de match) ---
+
+self.addEventListener("push", (event) => {
+  let data = { title: "US Baumoise Rugby", body: "" };
+  try {
+    if (event.data) data = { ...data, ...event.data.json() };
+  } catch {
+    if (event.data) data.body = event.data.text();
+  }
+
+  const options = {
+    body: data.body,
+    icon: "/icon-192.png",
+    badge: "/icon-192.png",
+    data: { url: data.url || "/" },
+  };
+  event.waitUntil(self.registration.showNotification(data.title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data && event.notification.data.url ? event.notification.data.url : "/";
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientsArr) => {
+      const existing = clientsArr.find((c) => c.url.startsWith(self.location.origin));
+      if (existing) {
+        existing.focus();
+        if ("navigate" in existing) existing.navigate(url);
+        return undefined;
+      }
+      return self.clients.openWindow(url);
+    })
+  );
+});

@@ -41,3 +41,30 @@ export async function createContact(formData: FormData) {
 
   redirect("/contact?success=1");
 }
+
+// --- Abonnement aux notifications push (appelé directement depuis le
+// composant client, pas via un <form>) ---
+
+type PushSubscriptionInput = {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+};
+
+export async function subscribePush(sub: PushSubscriptionInput): Promise<{ ok: boolean }> {
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.from("push_subscriptions").upsert(
+    {
+      endpoint: sub.endpoint,
+      p256dh: sub.keys.p256dh,
+      auth: sub.keys.auth,
+    },
+    { onConflict: "endpoint" }
+  );
+  return { ok: !error };
+}
+
+export async function unsubscribePush(endpoint: string): Promise<{ ok: boolean }> {
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.from("push_subscriptions").delete().eq("endpoint", endpoint);
+  return { ok: !error };
+}

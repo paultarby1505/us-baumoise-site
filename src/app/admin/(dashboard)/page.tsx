@@ -37,6 +37,11 @@ const sections = [
     label: "Messages",
     description: "Consulter les messages envoyés via le formulaire de contact.",
   },
+  {
+    href: "/admin/notifications",
+    label: "Notifications",
+    description: "Envoyer une alerte push, ou régler les notifications automatiques.",
+  },
 ];
 
 export default async function AdminHomePage({

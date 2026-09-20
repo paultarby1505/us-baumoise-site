@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { siteConfig } from "@/lib/config";
 import { CATEGORIES, categorySlug } from "@/lib/rugby";
+import { subscribePush, unsubscribePush } from "@/app/actions";
+import { urlBase64ToUint8Array } from "@/lib/push-client";
 
 const NAV_LINKS = [
   { href: "/actualites", label: "Actualités" },
@@ -63,6 +65,101 @@ function EnvelopeIcon() {
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="m3 7 9 6 9-6" />
     </svg>
+  );
+}
+
+function BellIcon({ active }: { active: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill={active ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
+/**
+ * Bouton d'activation des notifications push. Ne s'affiche que si le
+ * navigateur les supporte (jamais sur un vieux Safari desktop, par
+ * exemple), et reflète l'état réel de l'abonnement au chargement.
+ */
+function NotificationButton() {
+  const [supported, setSupported] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !publicKey) return;
+
+    navigator.serviceWorker.ready
+      .then((registration) => registration.pushManager.getSubscription())
+      .then((sub) => {
+        setSupported(true);
+        setSubscribed(!!sub);
+      })
+      .catch(() => {});
+  }, []);
+
+  async function toggle() {
+    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!publicKey || busy) return;
+    setBusy(true);
+    try {
+      const registration = await navigator.serviceWorker.ready;
+
+      if (subscribed) {
+        const sub = await registration.pushManager.getSubscription();
+        if (sub) {
+          await sub.unsubscribe();
+          await unsubscribePush(sub.endpoint);
+        }
+        setSubscribed(false);
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") return;
+
+      const sub = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      });
+      const json = sub.toJSON();
+      if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) return;
+      await subscribePush({
+        endpoint: json.endpoint,
+        keys: { p256dh: json.keys.p256dh, auth: json.keys.auth },
+      });
+      setSubscribed(true);
+    } catch (err) {
+      console.error("Échec de l'abonnement aux notifications", err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!supported) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      disabled={busy}
+      aria-label={subscribed ? "Désactiver les notifications" : "Activer les notifications"}
+      title={subscribed ? "Désactiver les notifications" : "Activer les notifications"}
+      className="flex h-9 w-9 items-center justify-center rounded text-white hover:text-club-gold-light disabled:opacity-50"
+    >
+      <BellIcon active={subscribed} />
+    </button>
   );
 }
 
@@ -164,6 +261,8 @@ export default function Header() {
           >
             {open ? <CloseIcon /> : <BurgerIcon />}
           </button>
+
+          <NotificationButton />
 
           <Link
             href="/contact"

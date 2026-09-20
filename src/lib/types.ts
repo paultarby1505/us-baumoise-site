@@ -44,6 +44,18 @@ export type SiteSettings = {
   id: number;
   hero_image_url: string | null;
   updated_at: string;
+  notif_actualite_active: boolean;
+  notif_actualite_texte: string;
+  notif_resultat_active: boolean;
+  notif_resultat_texte: string;
+};
+
+export type PushSubscriptionRow = {
+  id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  created_at: string;
 };
 
 export type ActualitePhoto = {

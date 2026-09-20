@@ -54,16 +54,30 @@ export async function subscribePush(
   sub: PushSubscriptionInput
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.from("push_subscriptions").upsert(
-    {
-      endpoint: sub.endpoint,
-      p256dh: sub.keys.p256dh,
-      auth: sub.keys.auth,
-    },
-    { onConflict: "endpoint" }
-  );
-  if (error) console.error("Échec de l'enregistrement de l'abonnement push", error);
-  return { ok: !error, error: error?.message };
+
+  // Pas de .upsert() : côté anonyme, la résolution ON CONFLICT DO UPDATE
+  // exige une visibilité SELECT que la policy (réservée à l'équipe) ne
+  // donne pas, et échoue avec une erreur RLS même si l'UPDATE seul est
+  // autorisé. On tente donc une insertion, et on bascule sur une mise à
+  // jour classique si l'endpoint existe déjà (ex. ré-abonnement iOS, qui
+  // réutilise le même endpoint après un désabonnement).
+  const { error: insertError } = await supabase.from("push_subscriptions").insert({
+    endpoint: sub.endpoint,
+    p256dh: sub.keys.p256dh,
+    auth: sub.keys.auth,
+  });
+  if (!insertError) return { ok: true };
+  if (insertError.code !== "23505") {
+    console.error("Échec de l'enregistrement de l'abonnement push", insertError);
+    return { ok: false, error: insertError.message };
+  }
+
+  const { error: updateError } = await supabase
+    .from("push_subscriptions")
+    .update({ p256dh: sub.keys.p256dh, auth: sub.keys.auth })
+    .eq("endpoint", sub.endpoint);
+  if (updateError) console.error("Échec de la mise à jour de l'abonnement push", updateError);
+  return { ok: !updateError, error: updateError?.message };
 }
 
 export async function unsubscribePush(endpoint: string): Promise<{ ok: boolean }> {

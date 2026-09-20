@@ -132,6 +132,12 @@ function NotificationButton() {
         return;
       }
 
+      // Un essai précédent (avant ce correctif) a pu créer un abonnement
+      // local jamais enregistré côté serveur. Safari refuse alors de
+      // ré-abonner avec une erreur de "conflit" : on nettoie d'abord.
+      const stale = await registration.pushManager.getSubscription();
+      if (stale) await stale.unsubscribe();
+
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),

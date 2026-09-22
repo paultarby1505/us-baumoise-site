@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Résultats",
   description:
     "Résultats des matchs du club de rugby US Baumoise à Baume-les-Dames (Doubs), par catégorie.",
+  alternates: { canonical: "/resultats" },
 };
 
 export default async function ResultatsPage() {

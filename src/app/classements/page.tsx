@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Classements",
   description:
     "Classements des équipes de rugby du championnat où évolue l'US Baumoise, club de Baume-les-Dames (Doubs).",
+  alternates: { canonical: "/classements" },
 };
 
 export default async function ClassementsPage() {

@@ -28,6 +28,17 @@ body {
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
+/* Sur mobile (et dans l'app installée), le moindre élément un peu trop large
+   rendait toute la page déplaçable latéralement : on voyait alors une bande
+   blanche sur le côté en changeant de page. La page reste donc figée
+   horizontalement, et le geste de balayage latéral ne fait plus défiler. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
 h1,
 h2,
 h3,

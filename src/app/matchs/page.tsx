@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Calendrier des matchs",
   description:
     "Calendrier et lieux des prochains matchs du club de rugby US Baumoise à Baume-les-Dames (Doubs), par catégorie.",
+  alternates: { canonical: "/matchs" },
 };
 
 export default async function MatchsPage() {

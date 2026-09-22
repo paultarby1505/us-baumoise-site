@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCategoriePage, getJoueurs } from "@/lib/queries";
-import { categoryFromSlug, posteRank } from "@/lib/rugby";
+import { categoryFromSlug, categorySlug, posteRank } from "@/lib/rugby";
 import PlayerCard from "@/components/PlayerCard";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +19,7 @@ export async function generateMetadata({
   return {
     title: `Effectif ${categorie}`,
     description: `Les joueurs de la catégorie ${categorie} du club de rugby US Baumoise à Baume-les-Dames (Doubs).`,
+    alternates: { canonical: `/effectif/${categorySlug(categorie)}` },
   };
 }
 

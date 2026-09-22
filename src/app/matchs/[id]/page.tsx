@@ -39,6 +39,7 @@ export async function generateMetadata({
     description: `Match ${match.categorie} du ${formatDate(match.date_match)}${
       match.lieu ? ` à ${match.lieu}` : ""
     }.`,
+    alternates: { canonical: `/matchs/${match.id}` },
   };
 }
 

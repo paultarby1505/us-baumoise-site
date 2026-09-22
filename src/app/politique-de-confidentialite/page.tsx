@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
   description: "Politique de confidentialité du site de l'US Baumoise Rugby.",
+  alternates: { canonical: "/politique-de-confidentialite" },
 };
 
 export default function PolitiqueConfidentialitePage() {

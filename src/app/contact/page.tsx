@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Contact",
   description:
     "Contacter le club de rugby US Baumoise à Baume-les-Dames (Doubs) : inscriptions, questions, demandes.",
+  alternates: { canonical: "/contact" },
 };
 
 export default async function ContactPage({

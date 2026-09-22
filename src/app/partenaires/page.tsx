@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Partenaires",
   description:
     "Les entreprises et commerces de Baume-les-Dames et sa région qui soutiennent le club de rugby US Baumoise.",
+  alternates: { canonical: "/partenaires" },
 };
 
 export default async function PartenairesPage() {

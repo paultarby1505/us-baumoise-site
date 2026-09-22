@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getActualites, getMatchs, getSiteSettings } from "@/lib/queries";
@@ -6,6 +7,14 @@ import ProchainMatchParCategorie from "@/components/ProchainMatchParCategorie";
 import { siteConfig } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
+
+// Le site répond aussi sur usbaumoise.vercel.app et sur les URL de preview :
+// sans URL canonique, Google voit plusieurs copies de la même page et choisit
+// lui-même laquelle indexer. Chaque page publique déclare donc la sienne, le
+// chemin étant résolu contre le `metadataBase` du layout racine.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 function currentTimestamp(): number {
   return Date.now();

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Effectif",
   description:
     "L'effectif du club de rugby US Baumoise à Baume-les-Dames (Doubs), du Baby rugby aux Seniors, par catégorie.",
+  alternates: { canonical: "/effectif" },
 };
 
 export default async function EffectifPage() {

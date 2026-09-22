@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Galerie",
   description:
     "Toutes les photos du club de rugby US Baumoise à Baume-les-Dames (Doubs) : matchs, événements et vie du club.",
+  alternates: { canonical: "/galerie" },
 };
 
 export default async function GaleriePage() {

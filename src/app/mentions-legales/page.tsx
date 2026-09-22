@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Mentions légales",
   description: "Mentions légales du site de l'US Baumoise Rugby.",
+  alternates: { canonical: "/mentions-legales" },
 };
 
 export default function MentionsLegalesPage() {

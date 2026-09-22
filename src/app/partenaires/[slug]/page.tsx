@@ -19,6 +19,7 @@ export async function generateMetadata({
   return {
     title: partenaire.nom,
     description: partenaire.resume ?? undefined,
+    alternates: { canonical: `/partenaires/${partenaire.slug}` },
   };
 }
 

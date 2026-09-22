@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Actualités",
   description:
     "Toute l'actualité du club de rugby US Baumoise à Baume-les-Dames (Doubs) : matchs, événements, vie du club.",
+  alternates: { canonical: "/actualites" },
 };
 
 export default async function ActualitesPage() {

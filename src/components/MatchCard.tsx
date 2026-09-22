@@ -2,24 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Match } from "@/lib/types";
 import { siteConfig } from "@/lib/config";
-import { HouseIcon, BusIcon } from "@/components/MatchTypeIcons";
-import { formatParis } from "@/lib/date-fr";
+import MatchMeta from "@/components/MatchMeta";
 import ScoreDuel from "@/components/ScoreDuel";
-
-function formatDate(iso: string) {
-  return formatParis(iso, {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function LogoCluster({ logos, alt }: { logos: string[]; alt: string }) {
   if (logos.length === 0) return null;
   return (
-    <span className="flex items-center gap-1">
+    <span className="flex max-w-full flex-wrap items-center justify-center gap-1">
       {logos.map((url) => (
         <Image
           key={url}
@@ -36,9 +25,9 @@ function LogoCluster({ logos, alt }: { logos: string[]; alt: string }) {
 
 function EquipeColonne({ nom, logos }: { nom: string; logos: string[] }) {
   return (
-    <div className="flex min-w-0 flex-col items-center gap-1 text-center font-semibold">
+    <div className="flex min-w-0 flex-col items-center gap-1 text-center text-sm font-semibold sm:text-base">
       <LogoCluster logos={logos} alt={`Logo ${nom}`} />
-      <span className="min-w-0">{nom}</span>
+      <span className="min-w-0 break-words hyphens-auto">{nom}</span>
     </div>
   );
 }
@@ -55,7 +44,7 @@ function OpposantRow({
   scoreAdverse: number | null;
 }) {
   return (
-    <div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
+    <div className="mt-1 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2">
       <EquipeColonne nom={siteConfig.shortName} logos={["/logo.png"]} />
       <div className="pt-1">
         <ScoreDuel scoreGauche={scoreUs} scoreDroite={scoreAdverse} />
@@ -79,19 +68,7 @@ export default function MatchCard({ match }: { match: Match }) {
       href={`/matchs/${match.id}`}
       className="block rounded-lg border-2 border-black p-5 transition-shadow hover:shadow-md"
     >
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-xs font-semibold uppercase tracking-wide text-club-gold">
-        <span>
-          {match.categorie}
-          {match.competition ? ` · ${match.competition}` : ""}
-        </span>
-        <span className="whitespace-nowrap text-center text-sm">
-          {formatDate(match.date_match)}
-        </span>
-        <span className="flex items-center justify-end gap-1 normal-case text-club-gold">
-          {match.domicile ? <HouseIcon /> : <BusIcon />}
-          {match.domicile ? "Domicile" : "Extérieur"}
-        </span>
-      </div>
+      <MatchMeta match={match} />
 
       {isTournoi ? (
         <div className="mt-2 flex flex-col items-center gap-2 text-center">
@@ -130,7 +107,7 @@ export default function MatchCard({ match }: { match: Match }) {
           />
         </div>
       ) : (
-        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
+        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2">
           <EquipeColonne nom={domicileNom} logos={domicileLogos} />
           <div className="pt-1">
             <ScoreDuel
@@ -143,7 +120,9 @@ export default function MatchCard({ match }: { match: Match }) {
       )}
 
       {match.lieu && (
-        <p className="mt-2 text-center text-sm font-semibold text-club-gold">{match.lieu}</p>
+        <p className="mt-2 break-words text-center text-sm font-semibold text-club-gold">
+          {match.lieu}
+        </p>
       )}
     </Link>
   );

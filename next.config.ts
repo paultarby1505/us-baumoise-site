@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    // Le quota gratuit d'optimisation d'images de Vercel est épuisé : au-delà,
+    // /_next/image répond 402 et les photos ne s'affichent plus. Les images
+    // sont donc servies telles quelles depuis Supabase, déjà compressées à
+    // l'envoi dans l'admin.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

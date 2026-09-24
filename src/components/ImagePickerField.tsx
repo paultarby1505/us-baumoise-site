@@ -39,7 +39,8 @@ export default function ImagePickerField({
 
     if (autoCrop && aspect) {
       try {
-        const blob = await getCenterCroppedBlob(file, aspect, file.type);
+        // Photo de joueur : toujours en JPEG, un PNG garderait plusieurs Mo.
+        const blob = await getCenterCroppedBlob(file, aspect, "image/jpeg");
         await applyCroppedFile(blob);
       } catch {
         setStatus("error");

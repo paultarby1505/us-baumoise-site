@@ -9,6 +9,8 @@ import { CATEGORIES, MATCH_CATEGORIES, categorySlug } from "@/lib/rugby";
 import { str, strOrNull, intOrNull } from "@/lib/form-data";
 import { parisInputToUtcIso } from "@/lib/date-fr";
 import { sendAutoNotification, sendPushToAll } from "@/lib/push-server";
+import { MINIBUS_IDS, computeTrajet, isMinibusId } from "@/lib/minibus";
+import { computeRoadDistance, type DistanceResult } from "@/lib/minibus-distance";
 
 async function uploadImageIfProvided(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
@@ -878,4 +880,126 @@ export async function updateNotificationSettings(formData: FormData) {
     .eq("id", 1);
   if (error) redirect(`/admin/notifications?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/notifications?success=Réglages enregistrés.");
+}
+
+// --- Minibus (trajets) ---
+
+function numOrNull(formData: FormData, key: string): number | null {
+  const value = str(formData, key).replace(",", ".");
+  if (value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** Appelé depuis le formulaire (bouton « Calculer ») : distance routière aller. */
+export async function calculerDistanceMinibus(
+  depart: string,
+  arrivee: string
+): Promise<DistanceResult> {
+  const profile = await getCurrentProfile();
+  if (!profile) return { ok: false, error: "Session expirée, reconnecte-toi." };
+  if (!depart.trim() || !arrivee.trim()) {
+    return { ok: false, error: "Indique un lieu de départ et un lieu d'arrivée." };
+  }
+  return computeRoadDistance(depart.trim(), arrivee.trim());
+}
+
+async function minibusTrajetData(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  formData: FormData,
+  existing?: { minibus: string; cout_km: number }
+): Promise<{ data: Record<string, unknown> } | { error: string }> {
+  const minibus = str(formData, "minibus");
+  if (!isMinibusId(minibus)) return { error: "Choisis le minibus utilisé." };
+
+  const date_trajet = str(formData, "date_trajet");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date_trajet)) return { error: "Date du trajet invalide." };
+
+  const depart = str(formData, "depart");
+  const arrivee = str(formData, "arrivee");
+  if (!depart || !arrivee) return { error: "Le départ et l'arrivée sont obligatoires." };
+
+  const kmAller = numOrNull(formData, "km_aller");
+  if (kmAller === null || kmAller <= 0) {
+    return { error: "Indique les kilomètres (bouton « Calculer » ou saisie manuelle)." };
+  }
+
+  // Un trajet modifié garde le tarif appliqué lors de sa saisie, sauf si on
+  // change de minibus : un changement de tarif ne réécrit pas l'historique.
+  let coutKm: number;
+  if (existing && existing.minibus === minibus) {
+    coutKm = Number(existing.cout_km);
+  } else {
+    const { data: vehicule, error } = await supabase
+      .from("minibus_vehicules")
+      .select("cout_km")
+      .eq("id", minibus)
+      .maybeSingle();
+    if (error) return { error: error.message };
+    coutKm = Number(vehicule?.cout_km ?? 0);
+  }
+
+  const allerRetour = formData.get("aller_retour") === "on";
+  return {
+    data: {
+      date_trajet,
+      minibus,
+      depart,
+      arrivee,
+      aller_retour: allerRetour,
+      cout_km: coutKm,
+      ...computeTrajet(kmAller, allerRetour, coutKm),
+      motif: strOrNull(formData, "motif"),
+      conducteur: strOrNull(formData, "conducteur"),
+    },
+  };
+}
+
+export async function createMinibusTrajet(formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  const result = await minibusTrajetData(supabase, formData);
+  if ("error" in result) {
+    redirect(`/admin/minibus/new?error=${encodeURIComponent(result.error)}`);
+  }
+  const { error } = await supabase.from("minibus_trajets").insert(result.data);
+  if (error) redirect(`/admin/minibus/new?error=${encodeURIComponent(error.message)}`);
+  redirect("/admin/minibus");
+}
+
+export async function updateMinibusTrajet(id: string, formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  const { data: existing } = await supabase
+    .from("minibus_trajets")
+    .select("minibus, cout_km")
+    .eq("id", id)
+    .maybeSingle();
+  const result = await minibusTrajetData(supabase, formData, existing ?? undefined);
+  if ("error" in result) {
+    redirect(`/admin/minibus/${id}?error=${encodeURIComponent(result.error)}`);
+  }
+  const { error } = await supabase.from("minibus_trajets").update(result.data).eq("id", id);
+  if (error) redirect(`/admin/minibus/${id}?error=${encodeURIComponent(error.message)}`);
+  redirect("/admin/minibus");
+}
+
+export async function deleteMinibusTrajet(id: string) {
+  const supabase = await createServerSupabaseClient();
+  await supabase.from("minibus_trajets").delete().eq("id", id);
+  redirect("/admin/minibus");
+}
+
+export async function updateMinibusTarifs(formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  for (const id of MINIBUS_IDS) {
+    const coutKm = numOrNull(formData, `cout_km_${id}`);
+    if (coutKm === null || coutKm < 0) {
+      redirect(`/admin/minibus?error=${encodeURIComponent("Tarif au km invalide.")}`);
+    }
+    const { error } = await supabase
+      .from("minibus_vehicules")
+      .update({ cout_km: coutKm, updated_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) redirect(`/admin/minibus?error=${encodeURIComponent(error.message)}`);
+  }
+  redirect("/admin/minibus?success=1");
 }

@@ -67,6 +67,9 @@ export default async function AdminDashboardLayout({
           <Link href="/admin/partenaires" className="hover:text-club-gold-light">
             Partenaires
           </Link>
+          <Link href="/admin/minibus" className="hover:text-club-gold-light">
+            Minibus
+          </Link>
           <Link href="/admin/contacts" className="hover:text-club-gold-light">
             Messages
           </Link>

@@ -33,11 +33,6 @@ const sections = [
     description: "Gérer les logos et fiches des partenaires du club.",
   },
   {
-    href: "/admin/minibus",
-    label: "Minibus",
-    description: "Saisir les trajets des minibus : kilomètres et coût calculés automatiquement.",
-  },
-  {
     href: "/admin/contacts",
     label: "Messages",
     description: "Consulter les messages envoyés via le formulaire de contact.",

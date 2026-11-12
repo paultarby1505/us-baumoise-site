@@ -117,3 +117,28 @@ export type ClassementLigne = {
   points_classement: number;
   created_at: string;
 };
+
+export type MinibusId = "ancien" | "recent";
+
+export type MinibusVehicule = {
+  id: MinibusId;
+  nom: string;
+  cout_km: number;
+  updated_at: string;
+};
+
+export type MinibusTrajet = {
+  id: string;
+  date_trajet: string;
+  minibus: MinibusId;
+  depart: string;
+  arrivee: string;
+  aller_retour: boolean;
+  km_aller: number;
+  km_total: number;
+  cout_km: number;
+  cout_total: number;
+  motif: string | null;
+  conducteur: string | null;
+  created_at: string;
+};

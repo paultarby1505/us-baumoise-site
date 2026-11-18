@@ -75,7 +75,8 @@ export default async function EditClassementPage({
         {ligne.logo_url && !ligne.notre_club && ligne.ffr_identifiant && (
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="retirer_logo" />
-            Retirer ce logo et utiliser le logo officiel de la FFR
+            Retirer ce logo et utiliser le logo officiel de la FFR (pour une entente, les
+            logos de chaque club s&apos;affichent déjà automatiquement)
           </label>
         )}
         {!ligne.logo_url && !ligne.notre_club && (

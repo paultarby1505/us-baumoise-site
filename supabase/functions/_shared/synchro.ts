@@ -8,12 +8,14 @@ import {
   lireCalendrier,
   lireClassement,
   lireFeuilleDeMatch,
+  type LigneClassementFfr,
   lirePage,
   normaliser,
   type PersonneFfr,
   ressemblanceEquipe,
   type RencontreFfr,
 } from "./monclubhouse.ts";
+import { enregistrerLogos } from "./logos.ts";
 
 // deno-lint-ignore no-explicit-any
 type Supabase = any;
@@ -35,6 +37,7 @@ type MatchLocal = {
   date_match: string;
   score_us: number | null;
   score_adverse: number | null;
+  adversaire_logos: string[] | null;
   ffr_match_id: number | null;
   ffr_maj: string | null;
 };
@@ -133,12 +136,11 @@ function versLigneEvenement(
 async function synchroniserClassementFfr(
   supabase: Supabase,
   source: SourceFfr,
-  base: string,
+  ffr: LigneClassementFfr[],
   // Noms d'adversaires utilisés sur notre site pour chaque équipe FFR
   // (appris en reliant les matchs) : « Rugby Club Auxonnais » = « Auxonne Gdr ».
   alias: Map<string, Set<string>>
 ) {
-  const ffr = lireClassement(await lirePage(`${base}/classements`));
   if (ffr.length === 0) return 0;
 
   const { data, error } = await supabase
@@ -267,10 +269,28 @@ export async function synchroniserCategorie(
   };
   const base = urlDeBase(source.url);
 
+  // Classement officiel, lu en premier : il donne aussi les logos des
+  // équipes, utiles pour les matchs créés ou complétés juste après.
+  let classementFfr: LigneClassementFfr[] | null = null;
+  try {
+    classementFfr = lireClassement(await lirePage(`${base}/classements`));
+  } catch (e) {
+    bilan.erreurs.push(`Classement : ${e instanceof Error ? e.message : String(e)}`);
+  }
+  const logosParIdentifiant = classementFfr
+    ? await enregistrerLogos(supabase, classementFfr, bilan.erreurs)
+    : new Map<string, string[]>();
+  const logosParEquipeId = new Map<number, string[]>();
+  for (const l of classementFfr ?? []) {
+    const logos = logosParIdentifiant.get(l.identifiant);
+    if (logos && logos.length > 0) logosParEquipeId.set(l.equipeId, logos);
+  }
+
   const alias = new Map<string, Set<string>>();
   const synchroClassement = async () => {
+    if (!classementFfr) return;
     try {
-      bilan.classement = await synchroniserClassementFfr(supabase, source, base, alias);
+      bilan.classement = await synchroniserClassementFfr(supabase, source, classementFfr, alias);
     } catch (e) {
       bilan.erreurs.push(`Classement : ${e instanceof Error ? e.message : String(e)}`);
     }
@@ -291,7 +311,7 @@ export async function synchroniserCategorie(
     supabase
       .from("matchs")
       .select(
-        "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, ffr_match_id, ffr_maj"
+        "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, adversaire_logos, ffr_match_id, ffr_maj"
       )
       .eq("categorie", source.categorie),
     supabase.from("joueurs").select("id, prenom, nom, categorie"),
@@ -309,6 +329,7 @@ export async function synchroniserCategorie(
     const domicile = estNous(r.locale.nom, source);
     const adversaire = domicile ? r.visiteuse.nom : r.locale.nom;
     const notreEquipeId = domicile ? r.locale.id : r.visiteuse.id;
+    const logosAdversaire = logosParEquipeId.get(domicile ? r.visiteuse.id : r.locale.id) ?? [];
     const scoreUs = domicile ? r.scoreLocale : r.scoreVisiteuse;
     const scoreAdv = domicile ? r.scoreVisiteuse : r.scoreLocale;
     const resultat = r.termine && scoreUs != null && scoreAdv != null;
@@ -332,10 +353,11 @@ export async function synchroniserCategorie(
             categorie: source.categorie,
             score_us: resultat ? scoreUs : null,
             score_adverse: resultat ? scoreAdv : null,
+            adversaire_logos: logosAdversaire,
             ffr_match_id: r.id,
           })
           .select(
-            "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, ffr_match_id, ffr_maj"
+            "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, adversaire_logos, ffr_match_id, ffr_maj"
           )
           .single();
         if (error) throw error;
@@ -346,6 +368,12 @@ export async function synchroniserCategorie(
         const maj: Record<string, unknown> = {};
         if (local.ffr_match_id !== r.id) maj.ffr_match_id = r.id;
         if (Date.parse(local.date_match) !== Date.parse(r.date)) maj.date_match = r.date;
+        // Logo de l'adversaire seulement s'il n'en a pas : un logo mis à la
+        // main dans l'admin reste prioritaire.
+        const sansLogo = (local.adversaire_logos ?? []).length === 0;
+        if (!local.adversaire2 && sansLogo && logosAdversaire.length > 0) {
+          maj.adversaire_logos = logosAdversaire;
+        }
         if (resultat && (local.score_us !== scoreUs || local.score_adverse !== scoreAdv)) {
           maj.score_us = scoreUs;
           maj.score_adverse = scoreAdv;

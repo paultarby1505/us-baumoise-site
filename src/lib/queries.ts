@@ -4,6 +4,7 @@ import type {
   ActualitePhoto,
   CategoriePage,
   ClassementLigne,
+  EquipeFfr,
   GalleryPhoto,
   Joueur,
   Match,
@@ -160,10 +161,39 @@ function compareClassement(a: ClassementLigne, b: ClassementLigne): number {
   return a.equipe.localeCompare(b.equipe);
 }
 
+// Logo à afficher pour chaque ligne : celui mis à la main dans l'admin s'il
+// existe, sinon celui de la base des logos FFR (repéré par l'identifiant FFR
+// de l'équipe), sinon rien (le tableau affiche alors les initiales).
+async function avecLogos(lignes: ClassementLigne[]): Promise<ClassementLigne[]> {
+  const identifiants = [
+    ...new Set(lignes.map((l) => l.ffr_identifiant).filter((v): v is string => !!v)),
+  ];
+  const parIdentifiant = new Map<string, string[]>();
+  if (identifiants.length > 0) {
+    // Sans la base des logos (table absente, erreur réseau), le classement
+    // s'affiche quand même.
+    const { data } = await supabase
+      .from("equipes_ffr")
+      .select("identifiant, logos")
+      .in("identifiant", identifiants);
+    for (const e of (data ?? []) as Pick<EquipeFfr, "identifiant" | "logos">[]) {
+      parIdentifiant.set(e.identifiant, e.logos ?? []);
+    }
+  }
+  return lignes.map((l) => ({
+    ...l,
+    logos: l.logo_url
+      ? [l.logo_url]
+      : l.notre_club
+        ? ["/logo.png"]
+        : ((l.ffr_identifiant && parIdentifiant.get(l.ffr_identifiant)) || []),
+  }));
+}
+
 export async function getClassements(): Promise<ClassementLigne[]> {
   const { data, error } = await supabase.from("classements").select("*");
   if (error) throw error;
-  return (data ?? [])
+  return (await avecLogos(data ?? []))
     .sort(compareClassement)
     .sort((a, b) => a.categorie.localeCompare(b.categorie));
 }
@@ -174,7 +204,7 @@ export async function getClassement(categorie: string): Promise<ClassementLigne[
     .select("*")
     .eq("categorie", categorie);
   if (error) throw error;
-  return (data ?? []).sort(compareClassement);
+  return (await avecLogos(data ?? [])).sort(compareClassement);
 }
 
 // Un match ne bascule en résultat que 5h après son coup d'envoi (le temps du

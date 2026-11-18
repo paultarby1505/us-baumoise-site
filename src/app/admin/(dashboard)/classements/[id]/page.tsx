@@ -72,6 +72,19 @@ export default async function EditClassementPage({
           label={ligne.logo_url ? "Remplacer le logo" : "Logo (optionnel)"}
           aspect={1}
         />
+        {ligne.logo_url && !ligne.notre_club && ligne.ffr_identifiant && (
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="retirer_logo" />
+            Retirer ce logo et utiliser le logo officiel de la FFR
+          </label>
+        )}
+        {!ligne.logo_url && !ligne.notre_club && (
+          <p className="text-xs text-foreground/50">
+            Sans logo ajouté ici, le site affiche automatiquement le logo officiel du club
+            récupéré sur Mon Club House (FFR) lors de la synchro, ou ses initiales s&apos;il
+            n&apos;en a pas.
+          </p>
+        )}
         <p className="text-xs text-foreground/50">
           Pas besoin de définir un ordre : le classement se trie automatiquement (points, puis
           différence, puis points marqués) à chaque enregistrement.

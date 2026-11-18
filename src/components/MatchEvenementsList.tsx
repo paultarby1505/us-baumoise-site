@@ -3,7 +3,7 @@ import type { Joueur, MatchEvenement } from "@/lib/types";
 
 const SECTIONS: { titre: string; types: MatchEvenement["type"][] }[] = [
   { titre: "Points marqués", types: ["essai", "essai_penalite", "transformation", "penalite", "drop"] },
-  { titre: "Cartons", types: ["carton_jaune", "carton_rouge"] },
+  { titre: "Cartons", types: ["carton_blanc", "carton_jaune", "carton_rouge"] },
   { titre: "Changements", types: ["remplacement"] },
 ];
 

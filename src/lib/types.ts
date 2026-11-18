@@ -38,6 +38,8 @@ export type Match = {
   score_us2: number | null;
   score_adverse2: number | null;
   classement_applique: ClassementApplique | null;
+  ffr_match_id: number | null;
+  ffr_maj: string | null;
   created_at: string;
 };
 
@@ -67,6 +69,7 @@ export type MatchEvenementType =
   | "transformation"
   | "penalite"
   | "drop"
+  | "carton_blanc"
   | "carton_jaune"
   | "carton_rouge"
   | "remplacement";
@@ -152,6 +155,7 @@ export type ClassementLigne = {
   equipe: string;
   logo_url: string | null;
   notre_club: boolean;
+  ffr_identifiant: string | null;
   joues: number;
   gagnes: number;
   nuls: number;
@@ -160,4 +164,15 @@ export type ClassementLigne = {
   points_encaisses: number;
   points_classement: number;
   created_at: string;
+};
+
+// Lien entre une catégorie du site et sa compétition sur Mon Club House (FFR).
+export type FfrSource = {
+  categorie: string;
+  url: string;
+  equipe_ffr: string;
+  actif: boolean;
+  derniere_synchro: string | null;
+  dernier_statut: string | null;
+  updated_at: string;
 };

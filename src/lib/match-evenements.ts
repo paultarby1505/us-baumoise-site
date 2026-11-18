@@ -13,6 +13,7 @@ export const EVENEMENT_TYPES: {
   { type: "penalite", label: "Pénalité", icone: "🎯", points: 3 },
   { type: "drop", label: "Drop", icone: "🎯", points: 3 },
   { type: "essai_penalite", label: "Essai de pénalité", icone: "🏉", points: 7 },
+  { type: "carton_blanc", label: "Carton blanc", icone: "⬜", points: 0 },
   { type: "carton_jaune", label: "Carton jaune", icone: "🟨", points: 0 },
   { type: "carton_rouge", label: "Carton rouge", icone: "🟥", points: 0 },
   { type: "remplacement", label: "Remplacement", icone: "🔄", points: 0 },

@@ -7,7 +7,7 @@ create table if not exists public.match_evenements (
   position integer not null default 0,
   type text not null check (type in (
     'essai', 'essai_penalite', 'transformation', 'penalite', 'drop',
-    'carton_jaune', 'carton_rouge', 'remplacement'
+    'carton_blanc', 'carton_jaune', 'carton_rouge', 'remplacement'
   )),
   minute smallint check (minute is null or (minute >= 0 and minute <= 120)),
   -- Joueur concerné (pour un remplacement : le joueur qui ENTRE).

@@ -23,10 +23,16 @@ export default async function FeuilleDeMatchPage({
   const match = data as Match | null;
   if (!match) notFound();
 
-  const [allJoueurs, { data: evenementsData }, { data: lignesData }] = await Promise.all([
+  const [allJoueurs, { data: evenementsData }, { data: lignesData }, { data: sourceFfr }] = await Promise.all([
     getJoueurs(),
     supabase.from("match_evenements").select("*").eq("match_id", id).order("position"),
     supabase.from("classements").select("*").eq("categorie", match.categorie),
+    supabase
+      .from("ffr_sources")
+      .select("categorie")
+      .eq("categorie", match.categorie)
+      .eq("actif", true)
+      .maybeSingle(),
   ]);
   const evenements = (evenementsData ?? []) as MatchEvenement[];
   const lignes = ((lignesData ?? []) as ClassementLigne[]).sort((a, b) =>
@@ -47,7 +53,9 @@ export default async function FeuilleDeMatchPage({
   // adversaire, dans une catégorie qui a un classement avec notre club.
   const notreLigne = lignes.find((l) => l.notre_club) ?? null;
   let classementPossible: string | null = null;
-  if (!match.adversaire || match.adversaire2) {
+  if (sourceFfr) {
+    classementPossible = `Le classement ${match.categorie} est repris automatiquement du site de la FFR (Synchro FFR) : rien à faire ici. Le score et le détail de ce match sont eux aussi mis à jour par la FFR dès qu'ils y sont publiés.`;
+  } else if (!match.adversaire || match.adversaire2) {
     classementPossible =
       "Tournoi ou triangulaire : le classement n'est pas mis à jour automatiquement.";
   } else if (!notreLigne) {

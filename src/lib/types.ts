@@ -164,6 +164,17 @@ export type ClassementLigne = {
   points_encaisses: number;
   points_classement: number;
   created_at: string;
+  // Calculé à la lecture (pas une colonne) : logo mis à la main sur la ligne,
+  // sinon logo(s) officiel(s) de la FFR (un par club pour une entente).
+  logos?: string[];
+};
+
+// Logos d'une équipe, recopiés depuis Mon Club House par la synchro FFR.
+export type EquipeFfr = {
+  identifiant: string;
+  nom: string;
+  logos: string[];
+  updated_at: string;
 };
 
 // Lien entre une catégorie du site et sa compétition sur Mon Club House (FFR).

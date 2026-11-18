@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getClassements } from "@/lib/queries";
 import { deleteClassement } from "@/app/admin/actions";
+import LogosEquipe from "@/components/LogosEquipe";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import { MATCH_CATEGORIES } from "@/lib/rugby";
 
@@ -42,17 +42,7 @@ export default async function AdminClassementsPage() {
                     <span className="w-5 shrink-0 text-sm font-semibold text-foreground/40">
                       {i + 1}
                     </span>
-                    <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded border border-black/10 bg-white">
-                      {ligne.logo_url && (
-                        <Image
-                          src={ligne.logo_url}
-                          alt=""
-                          fill
-                          className="object-contain p-1"
-                          sizes="36px"
-                        />
-                      )}
-                    </div>
+                    <LogosEquipe logos={ligne.logos ?? []} nom={ligne.equipe} taille={36} />
                     <div>
                       <p className="font-semibold">
                         {ligne.equipe}

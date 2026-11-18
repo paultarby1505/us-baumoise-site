@@ -64,6 +64,9 @@ export type LigneClassementFfr = {
   position: number;
   equipe: string; // nom affiché (« Us Baumoise Ob »)
   identifiant: string; // identifiant stable FFR (« us-baumoise-ob »)
+  equipeId: number; // identifiant de l'équipe dans cette compétition (calendrier)
+  // Logo du club, ou un logo par club pour une entente.
+  logos: string[];
   points: number;
   joues: number;
   gagnes: number;
@@ -84,8 +87,31 @@ type RankingBrut = {
     pointsDeMarqueAcquis: number | null;
     pointsDeMarqueConcedes: number | null;
   };
-  competitionEquipeId: { nomEdito: string | null; nom: string; identifiant: string };
+  competitionEquipeId: {
+    id: number;
+    nomEdito: string | null;
+    nom: string;
+    identifiant: string;
+    structureId?: { embleme?: string | null } | null;
+    regroupementId?: {
+      embleme?: string | null;
+      StructuresItem?: { structureId?: { embleme?: string | null } | null }[] | null;
+    } | null;
+  };
 };
+
+// Un club seul a son « embleme ». Une entente (« regroupement ») a un
+// emblème générique gris identique pour toutes : on prend plutôt le logo
+// de chacun des clubs qui la composent.
+function logosEquipe(e: RankingBrut["competitionEquipeId"]): string[] {
+  const valide = (u: string | null | undefined): u is string =>
+    !!u && u.startsWith("https://api-web.monclubhouse.ffr.fr/");
+  if (valide(e.structureId?.embleme)) return [e.structureId!.embleme!];
+  const clubs = (e.regroupementId?.StructuresItem ?? [])
+    .map((s) => s.structureId?.embleme)
+    .filter(valide);
+  return [...new Set(clubs)];
+}
 
 export function lireClassement(payload: string): LigneClassementFfr[] {
   const brut = valeurApresCle(payload, "rankingData");
@@ -96,6 +122,8 @@ export function lireClassement(payload: string): LigneClassementFfr[] {
       position: e.position,
       equipe: (e.competitionEquipeId.nomEdito || e.competitionEquipeId.nom).trim(),
       identifiant: e.competitionEquipeId.identifiant,
+      equipeId: e.competitionEquipeId.id,
+      logos: logosEquipe(e.competitionEquipeId),
       points: e.classementId.pointTerrain ?? 0,
       joues: e.classementId.joues ?? 0,
       gagnes: e.classementId.gagnes ?? 0,

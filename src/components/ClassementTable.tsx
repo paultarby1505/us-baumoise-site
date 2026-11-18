@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
+import LogosEquipe from "@/components/LogosEquipe";
 import { MATCH_CATEGORIES } from "@/lib/rugby";
 import type { ClassementLigne } from "@/lib/types";
 
@@ -65,17 +65,7 @@ export default function ClassementTable({ lignes }: { lignes: ClassementLigne[] 
                     <td className="py-2 pr-2">{i + 1}</td>
                     <td className="py-2 pr-2">
                       <div className="flex items-center gap-2">
-                        <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full border border-black/10 bg-white">
-                          {ligne.logo_url && (
-                            <Image
-                              src={ligne.logo_url}
-                              alt={`Logo ${ligne.equipe}`}
-                              fill
-                              className="object-contain p-0.5"
-                              sizes="24px"
-                            />
-                          )}
-                        </div>
+                        <LogosEquipe logos={ligne.logos ?? []} nom={ligne.equipe} />
                         <span>{ligne.equipe}</span>
                       </div>
                     </td>

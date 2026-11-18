@@ -862,6 +862,7 @@ export async function updateClassement(id: string, formData: FormData) {
 
   const updateData: Record<string, unknown> = classementData(formData);
   if (logoUrl) updateData.logo_url = logoUrl;
+  else if (formData.get("retirer_logo") === "on") updateData.logo_url = null;
 
   const { error } = await supabase.from("classements").update(updateData).eq("id", id);
   if (error) redirect(`/admin/classements/${id}?error=${encodeURIComponent(error.message)}`);

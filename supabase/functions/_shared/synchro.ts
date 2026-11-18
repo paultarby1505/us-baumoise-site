@@ -31,6 +31,7 @@ type MatchLocal = {
   categorie: string;
   adversaire: string | null;
   adversaire2: string | null;
+  domicile: boolean;
   date_match: string;
   score_us: number | null;
   score_adverse: number | null;
@@ -219,7 +220,12 @@ async function synchroniserClassementFfr(
 
 // --- Matchs -------------------------------------------------------------------
 
-function trouverMatchLocal(r: RencontreFfr, adversaire: string, matchs: MatchLocal[]) {
+function trouverMatchLocal(
+  r: RencontreFfr,
+  adversaire: string,
+  domicile: boolean,
+  matchs: MatchLocal[]
+) {
   const parId = matchs.find((m) => m.ffr_match_id === r.id);
   if (parId) return parId;
   const candidats = matchs.filter(
@@ -230,7 +236,20 @@ function trouverMatchLocal(r: RencontreFfr, adversaire: string, matchs: MatchLoc
   );
   if (parNom.length === 1) return parNom[0];
   const memeJour = candidats.filter((m) => ecartJours(m.date_match, r.date) === 0);
-  return memeJour.length === 1 ? memeJour[0] : null;
+  if (memeJour.length === 1) return memeJour[0];
+  // Match reporté par la FFR : même adversaire, même lieu, à 15 jours près.
+  const reporte = matchs
+    .filter(
+      (m) =>
+        m.ffr_match_id == null &&
+        !m.adversaire2 &&
+        m.domicile === domicile &&
+        m.adversaire &&
+        ressemblanceEquipe(m.adversaire, adversaire) >= 0.5 &&
+        ecartJours(m.date_match, r.date) <= 15
+    )
+    .sort((a, b) => ecartJours(a.date_match, r.date) - ecartJours(b.date_match, r.date));
+  return reporte[0] ?? null;
 }
 
 export async function synchroniserCategorie(
@@ -272,7 +291,7 @@ export async function synchroniserCategorie(
     supabase
       .from("matchs")
       .select(
-        "id, categorie, adversaire, adversaire2, date_match, score_us, score_adverse, ffr_match_id, ffr_maj"
+        "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, ffr_match_id, ffr_maj"
       )
       .eq("categorie", source.categorie),
     supabase.from("joueurs").select("id, prenom, nom, categorie"),
@@ -295,7 +314,7 @@ export async function synchroniserCategorie(
     const resultat = r.termine && scoreUs != null && scoreAdv != null;
 
     try {
-      let local = trouverMatchLocal(r, adversaire, matchs);
+      let local = trouverMatchLocal(r, adversaire, domicile, matchs);
       if (local?.adversaire) {
         const cle = normaliser(adversaire);
         if (!alias.has(cle)) alias.set(cle, new Set());
@@ -316,7 +335,7 @@ export async function synchroniserCategorie(
             ffr_match_id: r.id,
           })
           .select(
-            "id, categorie, adversaire, adversaire2, date_match, score_us, score_adverse, ffr_match_id, ffr_maj"
+            "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, ffr_match_id, ffr_maj"
           )
           .single();
         if (error) throw error;

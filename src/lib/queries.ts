@@ -180,15 +180,23 @@ async function avecLogos(lignes: ClassementLigne[]): Promise<ClassementLigne[]> 
       parIdentifiant.set(e.identifiant, e.logos ?? []);
     }
   }
-  return lignes.map((l) => ({
-    ...l,
-    logos: l.logo_url
-      ? [l.logo_url]
-      : l.notre_club
-        ? ["/logo.png"]
-        : ((l.ffr_identifiant && parIdentifiant.get(l.ffr_identifiant)) || []),
-  }));
+  return lignes.map((l) => {
+    const ffr = (l.ffr_identifiant && parIdentifiant.get(l.ffr_identifiant)) || [];
+    // Notre équipe : notre logo, suivi de celui des clubs avec qui on est en
+    // entente (OL Besançon pour l'UBB), sans l'ancien logo FFR de l'US Baumoise.
+    if (l.notre_club) {
+      return { ...l, logos: ["/logo.png", ...ffr.filter((u) => !u.includes(LOGO_FFR_US_BAUMOISE))] };
+    }
+    // Une entente (plusieurs clubs à la FFR) montre le logo de chaque club,
+    // même si un logo unique a été mis à la main.
+    if (ffr.length >= 2) return { ...l, logos: ffr };
+    return { ...l, logos: l.logo_url ? [l.logo_url] : ffr };
+  });
 }
+
+// Identifiant de l'image du logo de l'US Baumoise sur Mon Club House : notre
+// propre logo (/logo.png) le remplace partout sur le site.
+const LOGO_FFR_US_BAUMOISE = "b2558d2f-93d9-4a9d-a152-0a985eaf04e5";
 
 export async function getClassements(): Promise<ClassementLigne[]> {
   const { data, error } = await supabase.from("classements").select("*");

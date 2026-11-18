@@ -31,8 +31,9 @@ export default async function AdminClassementsPage() {
           <div key={cat} className="mt-8">
             <h2 className="text-lg font-bold text-club-gold">{cat}</h2>
             <p className="mt-1 text-xs text-foreground/50">
-              Ordre calculé automatiquement (points, différence, points marqués) — modifie les
-              lignes après chaque week-end, le classement se remet à jour tout seul.
+              Ordre calculé automatiquement (points, différence, points marqués). Nos matchs
+              se comptent tout seuls quand tu remplis la feuille de match (bouton « Résultat »
+              dans Matchs) ; modifie à la main les lignes des matchs entre autres équipes.
             </p>
             <div className="mt-3 divide-y divide-black/10 rounded-lg border border-black/10 bg-white">
               {rows.map((ligne, i) => (

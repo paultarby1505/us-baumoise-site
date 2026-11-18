@@ -41,6 +41,12 @@ export default async function EditMatchPage({
           Aller à la composition →
         </a>
       </div>
+      <a
+        href={`/admin/matchs/${id}/resultat`}
+        className="mt-4 inline-block rounded bg-club-black px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+      >
+        ✨ Feuille de match : score, marqueurs, cartons, classement
+      </a>
       {error && (
         <p className="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}

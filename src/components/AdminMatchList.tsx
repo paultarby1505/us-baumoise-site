@@ -84,6 +84,12 @@ export default function AdminMatchList({
               </p>
             </div>
             <div className="flex shrink-0 gap-3 text-sm">
+              <Link
+                href={`/admin/matchs/${match.id}/resultat`}
+                className="font-semibold text-club-gold hover:underline"
+              >
+                Résultat
+              </Link>
               <Link href={`/admin/matchs/${match.id}`} className="text-club-gold hover:underline">
                 Modifier
               </Link>

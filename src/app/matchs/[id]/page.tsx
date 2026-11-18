@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMatch, getMatchComposition } from "@/lib/queries";
+import { getJoueurs, getMatch, getMatchComposition, getMatchEvenements } from "@/lib/queries";
 import { siteConfig } from "@/lib/config";
 import MatchLogos from "@/components/MatchLogos";
 import MatchMeta from "@/components/MatchMeta";
@@ -10,6 +10,7 @@ import CompositionPitch from "@/components/CompositionPitch";
 import MatchTabs from "@/components/MatchTabs";
 import { formatParis } from "@/lib/date-fr";
 import ScoreDuel from "@/components/ScoreDuel";
+import MatchEvenementsList from "@/components/MatchEvenementsList";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,12 @@ export default async function MatchDetailPage({
   const match = await getMatch(id);
   if (!match) notFound();
 
-  const composition = await getMatchComposition(id);
+  const [composition, evenements] = await Promise.all([
+    getMatchComposition(id),
+    getMatchEvenements(id),
+  ]);
+  // L'effectif ne sert qu'à afficher les noms des joueurs du détail du match.
+  const joueurs = evenements.length > 0 ? await getJoueurs() : [];
 
   const isTournoi = !match.adversaire;
   const isTriangulaire = Boolean(match.adversaire && match.adversaire2);
@@ -179,9 +185,16 @@ export default async function MatchDetailPage({
       </div>
 
       <MatchTabs
-        defaultTab={composition.length > 0 ? "composition" : "infos"}
+        defaultTab={
+          evenements.length > 0 ? "resume" : composition.length > 0 ? "composition" : "infos"
+        }
         infoTab={infoTab}
         compositionTab={compositionTab}
+        resumeTab={
+          evenements.length > 0 ? (
+            <MatchEvenementsList evenements={evenements} joueurs={joueurs} />
+          ) : undefined
+        }
       />
     </div>
   );

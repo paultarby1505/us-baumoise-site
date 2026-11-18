@@ -37,6 +37,53 @@ export type Match = {
   adversaire2_logos: string[];
   score_us2: number | null;
   score_adverse2: number | null;
+  classement_applique: ClassementApplique | null;
+  ffr_match_id: number | null;
+  ffr_maj: string | null;
+  created_at: string;
+};
+
+// Valeurs ajoutées à une ligne de classement par un match.
+export type ClassementDelta = {
+  joues: number;
+  gagnes: number;
+  nuls: number;
+  perdus: number;
+  points_marques: number;
+  points_encaisses: number;
+  points_classement: number;
+};
+
+// Ce que le résultat d'un match a ajouté au classement, pour pouvoir
+// l'annuler proprement si le score est corrigé.
+export type ClassementApplique = {
+  us_id: string;
+  us: ClassementDelta;
+  adv_id: string | null;
+  adv: ClassementDelta | null;
+};
+
+export type MatchEvenementType =
+  | "essai"
+  | "essai_penalite"
+  | "transformation"
+  | "penalite"
+  | "drop"
+  | "carton_blanc"
+  | "carton_jaune"
+  | "carton_rouge"
+  | "remplacement";
+
+export type MatchEvenement = {
+  id: string;
+  match_id: string;
+  position: number;
+  type: MatchEvenementType;
+  minute: number | null;
+  joueur_id: string | null;
+  joueur_nom: string | null;
+  joueur_sortant_id: string | null;
+  joueur_sortant_nom: string | null;
   created_at: string;
 };
 
@@ -108,6 +155,7 @@ export type ClassementLigne = {
   equipe: string;
   logo_url: string | null;
   notre_club: boolean;
+  ffr_identifiant: string | null;
   joues: number;
   gagnes: number;
   nuls: number;
@@ -116,4 +164,15 @@ export type ClassementLigne = {
   points_encaisses: number;
   points_classement: number;
   created_at: string;
+};
+
+// Lien entre une catégorie du site et sa compétition sur Mon Club House (FFR).
+export type FfrSource = {
+  categorie: string;
+  url: string;
+  equipe_ffr: string;
+  actif: boolean;
+  derniere_synchro: string | null;
+  dernier_statut: string | null;
+  updated_at: string;
 };

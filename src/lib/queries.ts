@@ -7,6 +7,7 @@ import type {
   GalleryPhoto,
   Joueur,
   Match,
+  MatchEvenement,
   Partenaire,
   SiteSettings,
 } from "./types";
@@ -69,6 +70,16 @@ export async function getMatchComposition(matchId: string): Promise<CompositionS
   if (error) throw error;
   const rows = (data ?? []) as unknown as { slot: number; joueur: Joueur | null }[];
   return rows.filter((r): r is CompositionSlot => r.joueur !== null);
+}
+
+export async function getMatchEvenements(matchId: string): Promise<MatchEvenement[]> {
+  const { data, error } = await supabase
+    .from("match_evenements")
+    .select("*")
+    .eq("match_id", matchId)
+    .order("position", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
 }
 
 export async function getActualitePhotos(actualiteId: string): Promise<ActualitePhoto[]> {

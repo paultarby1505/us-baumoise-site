@@ -61,6 +61,9 @@ export default async function AdminDashboardLayout({
           <Link href="/admin/classements" className="hover:text-club-gold-light">
             Classements
           </Link>
+          <Link href="/admin/synchro-ffr" className="hover:text-club-gold-light">
+            Synchro FFR
+          </Link>
           <Link href="/admin/apparence" className="hover:text-club-gold-light">
             Apparence
           </Link>

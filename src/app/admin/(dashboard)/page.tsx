@@ -23,6 +23,11 @@ const sections = [
     description: "Mettre à jour le classement des équipes par catégorie.",
   },
   {
+    href: "/admin/synchro-ffr",
+    label: "Synchro FFR",
+    description: "Scores, classements et feuilles de match repris automatiquement de Mon Club House.",
+  },
+  {
     href: "/admin/apparence",
     label: "Apparence",
     description: "Changer la photo de fond de la page d'accueil.",

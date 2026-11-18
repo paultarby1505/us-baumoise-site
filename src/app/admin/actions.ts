@@ -9,6 +9,8 @@ import { CATEGORIES, MATCH_CATEGORIES, categorySlug } from "@/lib/rugby";
 import { str, strOrNull, intOrNull } from "@/lib/form-data";
 import { parisInputToUtcIso } from "@/lib/date-fr";
 import { sendAutoNotification, sendPushToAll } from "@/lib/push-server";
+import { recalculerContribution, synchroniserClassement } from "@/lib/classement-server";
+import type { ClassementApplique } from "@/lib/types";
 
 async function uploadImageIfProvided(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
@@ -487,7 +489,7 @@ export async function updateMatch(id: string, formData: FormData) {
   // chaque correction ultérieure.
   const { data: matchAvant } = await supabase
     .from("matchs")
-    .select("score_us, score_adverse")
+    .select("score_us, score_adverse, classement_applique")
     .eq("id", id)
     .maybeSingle();
 
@@ -549,6 +551,33 @@ export async function updateMatch(id: string, formData: FormData) {
   const { error } = await supabase.from("matchs").update(updateData).eq("id", id);
   if (error) redirect(`/admin/matchs/${id}?error=${encodeURIComponent(error.message)}`);
 
+  // Si ce match était déjà compté dans le classement et que le score a été
+  // corrigé ici, on remet le classement d'accord avec le nouveau score.
+  const dejaCompte = matchAvant?.classement_applique as ClassementApplique | null | undefined;
+  const scoreModifie =
+    matchAvant?.score_us !== updateData.score_us ||
+    matchAvant?.score_adverse !== updateData.score_adverse;
+  if (dejaCompte && scoreModifie) {
+    const scoreUs = updateData.score_us as number | null;
+    const scoreAdverse = updateData.score_adverse as number | null;
+    try {
+      await synchroniserClassement(
+        supabase,
+        id,
+        dejaCompte,
+        scoreUs != null && scoreAdverse != null
+          ? recalculerContribution(dejaCompte, scoreUs, scoreAdverse)
+          : null
+      );
+    } catch (e) {
+      redirect(
+        `/admin/matchs/${id}?error=${encodeURIComponent(
+          e instanceof Error ? e.message : "Échec de la mise à jour du classement"
+        )}`
+      );
+    }
+  }
+
   const resultatVientDetreSaisi =
     matchAvant?.score_us == null &&
     matchAvant?.score_adverse == null &&
@@ -571,6 +600,15 @@ export async function updateMatch(id: string, formData: FormData) {
 
 export async function deleteMatch(id: string) {
   const supabase = await createServerSupabaseClient();
+  // Un match supprimé ne doit plus compter dans le classement.
+  const { data: match } = await supabase
+    .from("matchs")
+    .select("classement_applique")
+    .eq("id", id)
+    .maybeSingle();
+  if (match?.classement_applique) {
+    await synchroniserClassement(supabase, id, match.classement_applique as ClassementApplique, null);
+  }
   await supabase.from("matchs").delete().eq("id", id);
   await removeStoredImages(supabase, "matchs-photos", id);
   redirect("/admin/matchs");

@@ -37,17 +37,19 @@ function OpposantRow({
   logos,
   scoreUs,
   scoreAdverse,
+  reporte,
 }: {
   nom: string;
   logos: string[];
   scoreUs: number | null;
   scoreAdverse: number | null;
+  reporte: boolean;
 }) {
   return (
     <div className="mt-1 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2">
       <EquipeColonne nom={siteConfig.shortName} logos={["/logo.png"]} />
       <div className="pt-1">
-        <ScoreDuel scoreGauche={scoreUs} scoreDroite={scoreAdverse} />
+        <ScoreDuel scoreGauche={scoreUs} scoreDroite={scoreAdverse} reporte={reporte} />
       </div>
       <EquipeColonne nom={nom} logos={logos} />
     </div>
@@ -98,12 +100,14 @@ export default function MatchCard({ match }: { match: Match }) {
             logos={match.adversaire_logos}
             scoreUs={match.score_us}
             scoreAdverse={match.score_adverse}
+            reporte={match.reporte}
           />
           <OpposantRow
             nom={match.adversaire2!}
             logos={match.adversaire2_logos}
             scoreUs={match.score_us2}
             scoreAdverse={match.score_adverse2}
+            reporte={match.reporte}
           />
         </div>
       ) : (
@@ -113,6 +117,7 @@ export default function MatchCard({ match }: { match: Match }) {
             <ScoreDuel
               scoreGauche={match.domicile ? match.score_us : match.score_adverse}
               scoreDroite={match.domicile ? match.score_adverse : match.score_us}
+              reporte={match.reporte}
             />
           </div>
           <EquipeColonne nom={exterieurNom} logos={exterieurLogos} />

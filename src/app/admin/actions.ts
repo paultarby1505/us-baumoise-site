@@ -473,6 +473,7 @@ export async function createMatch(formData: FormData) {
     adversaire2_logos: adversaire2 ? logo2Urls : [],
     score_us2: intOrNull(formData, "score_us2"),
     score_adverse2: intOrNull(formData, "score_adverse2"),
+    reporte: formData.get("reporte") === "on",
   });
   if (error) redirect(`/admin/matchs/new?error=${encodeURIComponent(error.message)}`);
   redirect("/admin/matchs");
@@ -545,6 +546,7 @@ export async function updateMatch(id: string, formData: FormData) {
     adversaire2_logos: adversaire2 ? [...keptLogos2, ...newLogo2Urls] : [],
     score_us2: intOrNull(formData, "score_us2"),
     score_adverse2: intOrNull(formData, "score_adverse2"),
+    reporte: formData.get("reporte") === "on",
   };
   if (afficheUrl) updateData.affiche_url = afficheUrl;
 

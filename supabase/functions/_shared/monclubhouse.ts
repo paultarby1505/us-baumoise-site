@@ -141,6 +141,8 @@ export type RencontreFfr = {
   date: string; // ISO UTC
   url: string;
   termine: boolean;
+  // Match reporté (« non jouable », « reporté »...) : pas de score à attendre.
+  reporte: boolean;
   competition: string;
   journee: string | null;
   locale: { id: number; nom: string };
@@ -162,6 +164,12 @@ type RencontreBrute = {
   rencontreResultatVisiteuseId: { pointsDeMarque: number | null } | null;
 };
 
+// États FFR d'un match qui n'aura pas lieu à la date prévue.
+export function estReporte(etat: string): boolean {
+  const e = normaliser(etat);
+  return e.includes("non jouable") || e.includes("report") || e.includes("annul");
+}
+
 export function lireCalendrier(payload: string): RencontreFfr[] {
   const brut = valeurApresCle(payload, "calendarResultsData");
   if (!brut || typeof brut !== "object") throw new Error("Calendrier introuvable sur la page FFR");
@@ -180,6 +188,7 @@ export function lireCalendrier(payload: string): RencontreFfr[] {
         date: heureFfrVersUtc(r.dateEffective),
         url: MONCLUBHOUSE + r.url_monclubhouse,
         termine: etat.startsWith("termin"),
+        reporte: estReporte(etat),
         competition: r.competitionId?.nom ?? "",
         journee: r.competitionJourId?.nom ?? null,
         locale: {

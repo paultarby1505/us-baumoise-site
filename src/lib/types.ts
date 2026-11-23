@@ -40,6 +40,7 @@ export type Match = {
   classement_applique: ClassementApplique | null;
   ffr_match_id: number | null;
   ffr_maj: string | null;
+  reporte: boolean;
   created_at: string;
 };
 

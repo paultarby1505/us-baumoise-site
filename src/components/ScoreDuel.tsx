@@ -13,10 +13,19 @@ function ScoreCarre({ value, gagnant }: { value: number | null; gagnant: boolean
 export default function ScoreDuel({
   scoreGauche,
   scoreDroite,
+  reporte = false,
 }: {
   scoreGauche: number | null;
   scoreDroite: number | null;
+  reporte?: boolean;
 }) {
+  if (reporte) {
+    return (
+      <span className="flex h-9 items-center justify-center whitespace-nowrap rounded border-2 border-black bg-black px-3 text-xs font-bold uppercase tracking-wide text-white">
+        Reporté
+      </span>
+    );
+  }
   const matchJoue = scoreGauche !== null && scoreDroite !== null && scoreGauche !== scoreDroite;
   const gaucheGagne = matchJoue && scoreGauche! > scoreDroite!;
   const droiteGagne = matchJoue && scoreDroite! > scoreGauche!;

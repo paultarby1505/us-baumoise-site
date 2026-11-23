@@ -40,6 +40,7 @@ type MatchLocal = {
   adversaire_logos: string[] | null;
   ffr_match_id: number | null;
   ffr_maj: string | null;
+  reporte: boolean | null;
 };
 
 type LigneLocale = {
@@ -311,7 +312,7 @@ export async function synchroniserCategorie(
     supabase
       .from("matchs")
       .select(
-        "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, adversaire_logos, ffr_match_id, ffr_maj"
+        "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, adversaire_logos, reporte, ffr_match_id, ffr_maj"
       )
       .eq("categorie", source.categorie),
     supabase.from("joueurs").select("id, prenom, nom, categorie"),
@@ -355,9 +356,10 @@ export async function synchroniserCategorie(
             score_adverse: resultat ? scoreAdv : null,
             adversaire_logos: logosAdversaire,
             ffr_match_id: r.id,
+            reporte: r.reporte && !resultat,
           })
           .select(
-            "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, adversaire_logos, ffr_match_id, ffr_maj"
+            "id, categorie, adversaire, adversaire2, domicile, date_match, score_us, score_adverse, adversaire_logos, reporte, ffr_match_id, ffr_maj"
           )
           .single();
         if (error) throw error;
@@ -374,6 +376,8 @@ export async function synchroniserCategorie(
         if (!local.adversaire2 && sansLogo && logosAdversaire.length > 0) {
           maj.adversaire_logos = logosAdversaire;
         }
+        const reporte = r.reporte && !resultat;
+        if ((local.reporte ?? false) !== reporte) maj.reporte = reporte;
         if (resultat && (local.score_us !== scoreUs || local.score_adverse !== scoreAdv)) {
           maj.score_us = scoreUs;
           maj.score_adverse = scoreAdv;

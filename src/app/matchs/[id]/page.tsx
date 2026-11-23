@@ -131,7 +131,11 @@ export default async function MatchDetailPage({
                 <span className="w-full break-words hyphens-auto">{siteConfig.shortName}</span>
               </span>
               <span className="flex justify-center">
-                <ScoreDuel scoreGauche={match.score_us} scoreDroite={match.score_adverse} />
+                <ScoreDuel
+                  scoreGauche={match.score_us}
+                  scoreDroite={match.score_adverse}
+                  reporte={match.reporte}
+                />
               </span>
               <span className="flex min-w-0 flex-col items-center gap-2 text-sm font-semibold sm:text-base">
                 <MatchLogos
@@ -147,7 +151,11 @@ export default async function MatchDetailPage({
                 <span className="w-full break-words hyphens-auto">{siteConfig.shortName}</span>
               </span>
               <span className="flex justify-center">
-                <ScoreDuel scoreGauche={match.score_us2} scoreDroite={match.score_adverse2} />
+                <ScoreDuel
+                  scoreGauche={match.score_us2}
+                  scoreDroite={match.score_adverse2}
+                  reporte={match.reporte}
+                />
               </span>
               <span className="flex min-w-0 flex-col items-center gap-2 text-sm font-semibold sm:text-base">
                 <MatchLogos
@@ -168,6 +176,7 @@ export default async function MatchDetailPage({
               <ScoreDuel
                 scoreGauche={match.domicile ? match.score_us : match.score_adverse}
                 scoreDroite={match.domicile ? match.score_adverse : match.score_us}
+                reporte={match.reporte}
               />
             </div>
             <div className="flex min-w-0 flex-col items-center gap-2 text-sm sm:text-base">

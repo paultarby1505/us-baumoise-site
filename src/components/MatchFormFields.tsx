@@ -29,6 +29,7 @@ export type MatchFormInitial = {
   adversaire_logos: string[];
   adversaire2_logos: string[];
   affiche_url: string | null;
+  reporte: boolean;
 };
 
 const DEFAULT_INITIAL: MatchFormInitial = {
@@ -47,6 +48,7 @@ const DEFAULT_INITIAL: MatchFormInitial = {
   adversaire_logos: [],
   adversaire2_logos: [],
   affiche_url: null,
+  reporte: false,
 };
 
 export default function MatchFormFields({ initial }: { initial?: Partial<MatchFormInitial> }) {
@@ -258,6 +260,11 @@ export default function MatchFormFields({ initial }: { initial?: Partial<MatchFo
           </label>
         </div>
       )}
+
+      <label className="flex items-center gap-2 text-sm font-medium">
+        <input type="checkbox" name="reporte" defaultChecked={values.reporte} />
+        Match reporté (affiche « Reporté » à la place du score)
+      </label>
 
       <p className="text-xs text-foreground/50">
         Laisse les scores vides pour un match pas encore joué. La composition se règle après

@@ -71,6 +71,7 @@ export default async function EditMatchPage({
             score_adverse: match.score_adverse ?? "",
             score_us2: match.score_us2 ?? "",
             score_adverse2: match.score_adverse2 ?? "",
+            reporte: match.reporte ?? false,
             adversaire_logos: match.adversaire_logos,
             adversaire2_logos: match.adversaire2_logos,
             affiche_url: match.affiche_url,

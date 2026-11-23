@@ -62,7 +62,9 @@ export default function AdminMatchList({
                     ? `${match.domicile ? "US Baumoise" : match.adversaire} vs ${
                         match.domicile ? match.adversaire : "US Baumoise"
                       }${
-                        match.score_us !== null && match.score_adverse !== null
+                        match.reporte
+                          ? " — reporté"
+                          : match.score_us !== null && match.score_adverse !== null
                           ? ` — ${match.domicile ? match.score_us : match.score_adverse}-${
                               match.domicile ? match.score_adverse : match.score_us
                             }`
